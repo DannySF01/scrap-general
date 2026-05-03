@@ -9,7 +9,7 @@ interface BaseProps {
 }
 
 export function Base({ base, robot }: BaseProps) {
-  const { deployToBase } = useGameStore();
+  const { deployToBase, baseHp } = useGameStore();
 
   const handleInteraction = () => {
     if (!base.isUnlocked) {
@@ -49,6 +49,7 @@ export function Base({ base, robot }: BaseProps) {
             </motion.div>
             <div className="w-8 h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
               <div className="bg-indigo-500 h-full w-full" />
+              {baseHp}
             </div>
           </div>
         ) : base.isUnlocked ? (

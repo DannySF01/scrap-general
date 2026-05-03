@@ -1,4 +1,6 @@
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
+export type RobotType = "SENTRY";
+export type EnemyType = "SCOUT" | "TANK";
 
 export interface Base {
   id: number;
@@ -11,20 +13,21 @@ export interface Base {
 
 export interface Robot {
   id: string;
-  type: "SENTRY";
-  x: number;
-  y: number;
+  type: RobotType;
+  position: { x: number; y: number };
   level: number;
   damage: number;
   fireRate: number;
   lastShot: number;
+  lastTargetPos: { x: number; y: number } | null;
 }
 
 export interface Enemy {
   id: string;
-  rarity: Rarity;
+  type: EnemyType;
   hp: number;
   maxHp: number;
+  damage: number;
   speed: number;
   position: { x: number; y: number };
   reward: number;
