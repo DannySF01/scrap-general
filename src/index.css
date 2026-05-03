@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --background: var(--color-slate-950);
+  --foreground: var(--color-slate-100);
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    user-select: none;
+    overflow: hidden;
+  }
+}
