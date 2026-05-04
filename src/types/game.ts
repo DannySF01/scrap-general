@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 
+export type GameStatus = "IDLE" | "PLAYING" | "PAUSED" | "GAME_OVER";
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
 export type RobotType = "SENTRY" | "SNIPER";
 export type EnemyType = "MINION" | "TANK";

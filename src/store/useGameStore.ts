@@ -1,8 +1,10 @@
 import { create } from "zustand";
-import type { Enemy, Robot, Base } from "../types/game";
+import type { Enemy, Robot, Base, GameStatus } from "../types/game";
 import { REGISTRY } from "../data/registry";
 
 interface GameState {
+  status: GameStatus;
+
   scrap: number;
   luck: number;
   wave: number;
@@ -14,23 +16,25 @@ interface GameState {
 
   lastSpawnTime: number;
 
+  startGame: () => void;
+  togglePause: () => void;
+  resetGame: () => void;
   addScrap: (amount: number) => void;
-
   deployToBase: (baseId: number, robot: Robot["type"]) => void;
-
   spawnEnemies: () => void;
   tickEnemies: () => void;
-
   tick(): void;
   processCombat: () => void;
-
   takeDamage: (amount: number) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
+  status: "IDLE",
+
   scrap: 0,
   luck: 0,
   wave: 0,
+
   baseHp: 100,
   bases: [
     {
@@ -78,6 +82,31 @@ export const useGameStore = create<GameState>((set, get) => ({
   enemies: [],
   lastSpawnTime: Date.now(),
 
+  startGame: () => set({ status: "PLAYING" }),
+
+  togglePause: () => {
+    const { status } = get();
+
+    if (status === "PLAYING") {
+      set({ status: "PAUSED" });
+    } else if (status === "PAUSED") {
+      set({ status: "PLAYING" });
+    }
+  },
+
+  resetGame: () =>
+    set({
+      status: "IDLE",
+      scrap: 0,
+      luck: 0,
+      wave: 0,
+      baseHp: 100,
+      robots: [],
+      enemies: [],
+      bases: get().bases.map((b) => ({ ...b, occupantId: null })),
+      lastSpawnTime: Date.now(),
+    }),
+
   addScrap: (amount) => set((state) => ({ scrap: state.scrap + amount })),
 
   takeDamage: (damage: Robot["damage"]) => {
@@ -87,8 +116,22 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   tick: () => {
-    const { tickEnemies, processCombat, spawnEnemies, lastSpawnTime } = get();
+    const {
+      status,
+      baseHp,
+      tickEnemies,
+      processCombat,
+      spawnEnemies,
+      lastSpawnTime,
+    } = get();
     const now = Date.now();
+
+    if (status !== "PLAYING") return;
+
+    if (baseHp <= 0) {
+      set({ status: "GAME_OVER" });
+      return;
+    }
 
     if (now - lastSpawnTime > 3000) {
       spawnEnemies();

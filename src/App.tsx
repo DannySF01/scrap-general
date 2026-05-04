@@ -3,11 +3,30 @@ import Stat from "./components/Stat";
 import { Arena } from "./components/Arena";
 import { useGameStore } from "./store/useGameStore";
 import { useGameLoop } from "./hooks/useGameLoop";
+import { GameOverlay } from "./components/GameOverlay";
+import { useEffect } from "react";
 
 export default function App() {
-  const { scrap, wave, luck } = useGameStore();
+  const { scrap, wave, luck, status, togglePause } = useGameStore();
 
   useGameLoop();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space") e.preventDefault();
+
+      switch (e.code) {
+        case "Escape":
+          if (status === "PLAYING" || status === "PAUSED") {
+            togglePause();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [status, togglePause]);
 
   return (
     <div className="h-screen w-300 mx-auto flex flex-col bg-slate-950 p-4 gap-4 overflow-hidden relative">
@@ -32,6 +51,7 @@ export default function App() {
 
       <main className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-xl relative overflow-hidden group">
         <Arena />
+        <GameOverlay />
       </main>
 
       <footer className="grid grid-cols-4 gap-4 h-28">
