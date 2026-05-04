@@ -25,7 +25,7 @@ export function EnemyUnit({ enemy }: { enemy: Enemy }) {
           repeat: Infinity,
           duration: config.hp > 100 ? 2 : 1,
         }}
-        className={`text-${config.color}-500 drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]`}
+        className={`text-${config.color}-500`}
       >
         <Icon
           size={config.size}

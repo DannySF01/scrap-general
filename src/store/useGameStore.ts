@@ -15,6 +15,9 @@ interface GameState {
   robots: Robot[];
   enemies: Enemy[];
 
+  selectedRobotType: Robot["type"];
+  selectRobot: (type: Robot["type"]) => void;
+
   lastSpawnTime: number;
 
   startGame: () => void;
@@ -83,6 +86,10 @@ export const useGameStore = create<GameState>()(
       ],
       robots: [],
       enemies: [],
+
+      selectedRobotType: "SENTRY",
+      selectRobot: (type: Robot["type"]) => set({ selectedRobotType: type }),
+
       lastSpawnTime: Date.now(),
 
       startGame: () => set({ status: "PLAYING" }),
@@ -195,8 +202,14 @@ export const useGameStore = create<GameState>()(
         const { bases, robots } = get();
         const targetBase = bases.find((b: Base) => b.id === baseId);
 
-        if (!targetBase || !targetBase.isUnlocked || targetBase.occupantId)
-          return;
+        if (!targetBase || !targetBase.isUnlocked) return;
+
+        let updatedRobots = [...robots];
+        if (targetBase.occupantId) {
+          updatedRobots = updatedRobots.filter(
+            (r) => r.id !== targetBase.occupantId,
+          );
+        }
 
         const template = REGISTRY.ROBOTS[type];
 
@@ -206,12 +219,12 @@ export const useGameStore = create<GameState>()(
           level: 1,
           position: { x: targetBase.x, y: targetBase.y },
           type,
-          lastShot: 0,
+          lastShot: Date.now(),
           lastTargetPos: null,
         };
 
         set({
-          robots: [...robots, newRobot],
+          robots: [...updatedRobots, newRobot],
           bases: bases.map((b) =>
             b.id === baseId ? { ...b, occupantId: newRobot.id } : b,
           ),

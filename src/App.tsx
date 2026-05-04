@@ -5,6 +5,7 @@ import { useGameStore } from "./store/useGameStore";
 import { useGameLoop } from "./hooks/useGameLoop";
 import { GameOverlay } from "./components/GameOverlay";
 import { useEffect } from "react";
+import { DeploymentHub } from "./components/DeploymentHub";
 
 export default function App() {
   const { scrap, wave, luck, status, togglePause } = useGameStore();
@@ -52,6 +53,7 @@ export default function App() {
       <main className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-xl relative overflow-hidden group">
         <Arena />
         <GameOverlay />
+        <DeploymentHub />
       </main>
 
       <footer className="grid grid-cols-4 gap-4 h-28">

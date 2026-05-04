@@ -15,4 +15,8 @@
     user-select: none;
     overflow: hidden;
   }
+
+  button {
+    cursor: pointer;
+  }
 }

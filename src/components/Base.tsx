@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Crosshair, Lock, Plus } from "lucide-react";
+import { Lock, Plus } from "lucide-react";
 import type { Base, Robot } from "../types/game";
 import { useGameStore } from "../store/useGameStore";
+import { REGISTRY } from "../data/registry";
 
 interface BaseProps {
   base: Base;
@@ -9,14 +10,14 @@ interface BaseProps {
 }
 
 export function Base({ base, robot }: BaseProps) {
-  const { deployToBase, baseHp } = useGameStore();
+  const { deployToBase, selectedRobotType } = useGameStore();
+
+  const robotConfig = robot ? REGISTRY.ROBOTS[robot.type] : null;
+  const Icon = robotConfig ? robotConfig.icon : Plus;
 
   const handleInteraction = () => {
-    if (!base.isUnlocked) {
-      return;
-    } else if (!robot) {
-      deployToBase(base.id, "SENTRY");
-    }
+    if (!base.isUnlocked) return;
+    deployToBase(base.id, selectedRobotType);
   };
 
   return (
@@ -33,7 +34,7 @@ export function Base({ base, robot }: BaseProps) {
             !base.isUnlocked
               ? "border-slate-800 bg-slate-900/20 opacity-40 hover:opacity-100 hover:border-energy"
               : robot
-                ? "border-indigo-500 bg-slate-900/80 shadow-[0_-10px_20px_rgba(99,102,241,0.2)]"
+                ? `border-${robotConfig?.color}-500 bg-slate-900/80 shadow-[0_-10px_20px_rgba(99,102,241,0.2)]`
                 : "border-slate-700 bg-slate-800/40 hover:border-indigo-400"
           }`}
       >
@@ -42,17 +43,13 @@ export function Base({ base, robot }: BaseProps) {
             <motion.div
               animate={
                 robot.lastShot && robot.lastShot > Date.now() - 100
-                  ? { scale: [1, 1.2, 1] }
+                  ? { scale: [1, 1.4, 1], rotate: [0, 10, -10, 0] }
                   : {}
               }
-              className="text-indigo-400"
+              className={`text-${robotConfig?.color}-400`}
             >
-              <Crosshair size={28} />
+              <Icon size={28} />
             </motion.div>
-            <div className="w-8 h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
-              <div className="bg-indigo-500 h-full w-full" />
-              {baseHp}
-            </div>
           </div>
         ) : base.isUnlocked ? (
           <Plus
@@ -75,7 +72,7 @@ export function Base({ base, robot }: BaseProps) {
             : "bg-red-950/20 border-red-900/30 text-red-900 group-hover:text-energy group-hover:border-energy"
         }`}
       >
-        {base.isUnlocked ? base.name : `LOCKED // 250 SC`}
+        {base.isUnlocked ? (robot ? robotConfig?.type : `DEPLOY`) : `LOCKED`}
       </div>
     </div>
   );
