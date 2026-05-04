@@ -37,7 +37,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       id: 1,
       name: "VANGUARD-01",
       x: 20,
-      y: 90,
+      y: 93,
       isUnlocked: true,
       occupantId: null,
     },
@@ -45,7 +45,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       id: 2,
       name: "ALPHA-02",
       x: 35,
-      y: 90,
+      y: 93,
       isUnlocked: false,
       occupantId: null,
     },
@@ -53,7 +53,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       id: 3,
       name: "CENTER-03",
       x: 50,
-      y: 90,
+      y: 93,
       isUnlocked: false,
       occupantId: null,
     },
@@ -61,7 +61,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       id: 4,
       name: "BRAVO-04",
       x: 65,
-      y: 90,
+      y: 93,
       isUnlocked: false,
       occupantId: null,
     },
@@ -69,7 +69,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       id: 5,
       name: "REAR-05",
       x: 80,
-      y: 90,
+      y: 93,
       isUnlocked: false,
       occupantId: null,
     },
@@ -212,7 +212,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           position: { ...e.position, y: e.position.y + e.speed },
         }))
         .filter((e) => {
-          if (e.position.y >= 85) {
+          if (e.position.y >= 83) {
             takeDamage(e.damage);
             return false;
           }

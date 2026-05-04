@@ -3,6 +3,7 @@ import { useGameStore } from "../store/useGameStore";
 import { Base } from "./Base";
 import { EnemyUnit } from "./EnemyUnit";
 import { LaserBeam } from "./LaserBeam";
+import { FortressWall } from "./FortressWall";
 
 export function Arena() {
   const { bases, robots, enemies } = useGameStore();
@@ -42,6 +43,8 @@ export function Arena() {
           <EnemyUnit key={enemy.id} enemy={enemy} />
         ))}
       </AnimatePresence>
+
+      <FortressWall />
     </div>
   );
 }
