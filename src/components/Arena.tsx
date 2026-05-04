@@ -1,3 +1,4 @@
+import { AnimatePresence } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
 import { Base } from "./Base";
 import { EnemyUnit } from "./EnemyUnit";
@@ -18,7 +19,8 @@ export function Arena() {
 
       {robots.map(
         (robot) =>
-          robot.lastTargetPos && (
+          robot.lastTargetPos &&
+          robot.position && (
             <LaserBeam
               key={`laser-${robot.id}-${robot.lastShot}`}
               from={robot.position}
@@ -35,9 +37,11 @@ export function Arena() {
         />
       ))}
 
-      {enemies.map((enemy) => (
-        <EnemyUnit key={enemy.id} enemy={enemy} />
-      ))}
+      <AnimatePresence>
+        {enemies.map((enemy) => (
+          <EnemyUnit key={enemy.id} enemy={enemy} />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

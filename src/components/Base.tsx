@@ -41,7 +41,9 @@ export function Base({ base, robot }: BaseProps) {
           <div className="flex flex-col items-center">
             <motion.div
               animate={
-                robot.lastShot > Date.now() - 100 ? { scale: [1, 1.2, 1] } : {}
+                robot.lastShot && robot.lastShot > Date.now() - 100
+                  ? { scale: [1, 1.2, 1] }
+                  : {}
               }
               className="text-indigo-400"
             >
