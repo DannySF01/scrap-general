@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Enemy, Robot, Base, GameStatus } from "../types/game";
 import { REGISTRY } from "../data/registry";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 interface GameState {
   status: GameStatus;
@@ -28,239 +29,248 @@ interface GameState {
   takeDamage: (amount: number) => void;
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
-  status: "IDLE",
-
-  scrap: 0,
-  luck: 0,
-  wave: 0,
-
-  baseHp: 100,
-  bases: [
-    {
-      id: 1,
-      name: "VANGUARD-01",
-      x: 20,
-      y: 93,
-      isUnlocked: true,
-      occupantId: null,
-    },
-    {
-      id: 2,
-      name: "ALPHA-02",
-      x: 35,
-      y: 93,
-      isUnlocked: false,
-      occupantId: null,
-    },
-    {
-      id: 3,
-      name: "CENTER-03",
-      x: 50,
-      y: 93,
-      isUnlocked: false,
-      occupantId: null,
-    },
-    {
-      id: 4,
-      name: "BRAVO-04",
-      x: 65,
-      y: 93,
-      isUnlocked: false,
-      occupantId: null,
-    },
-    {
-      id: 5,
-      name: "REAR-05",
-      x: 80,
-      y: 93,
-      isUnlocked: false,
-      occupantId: null,
-    },
-  ],
-  robots: [],
-  enemies: [],
-  lastSpawnTime: Date.now(),
-
-  startGame: () => set({ status: "PLAYING" }),
-
-  togglePause: () => {
-    const { status } = get();
-
-    if (status === "PLAYING") {
-      set({ status: "PAUSED" });
-    } else if (status === "PAUSED") {
-      set({ status: "PLAYING" });
-    }
-  },
-
-  resetGame: () =>
-    set({
+export const useGameStore = create<GameState>()(
+  persist(
+    (set, get) => ({
       status: "IDLE",
+
       scrap: 0,
       luck: 0,
       wave: 0,
+
       baseHp: 100,
+      bases: [
+        {
+          id: 1,
+          name: "VANGUARD-01",
+          x: 20,
+          y: 93,
+          isUnlocked: true,
+          occupantId: null,
+        },
+        {
+          id: 2,
+          name: "ALPHA-02",
+          x: 35,
+          y: 93,
+          isUnlocked: false,
+          occupantId: null,
+        },
+        {
+          id: 3,
+          name: "CENTER-03",
+          x: 50,
+          y: 93,
+          isUnlocked: false,
+          occupantId: null,
+        },
+        {
+          id: 4,
+          name: "BRAVO-04",
+          x: 65,
+          y: 93,
+          isUnlocked: false,
+          occupantId: null,
+        },
+        {
+          id: 5,
+          name: "REAR-05",
+          x: 80,
+          y: 93,
+          isUnlocked: false,
+          occupantId: null,
+        },
+      ],
       robots: [],
       enemies: [],
-      bases: get().bases.map((b) => ({ ...b, occupantId: null })),
       lastSpawnTime: Date.now(),
-    }),
 
-  addScrap: (amount) => set((state) => ({ scrap: state.scrap + amount })),
+      startGame: () => set({ status: "PLAYING" }),
 
-  takeDamage: (damage: Robot["damage"]) => {
-    const { baseHp } = get();
+      togglePause: () => {
+        const { status } = get();
 
-    set(() => ({ baseHp: baseHp - damage }));
-  },
+        if (status === "PLAYING") {
+          set({ status: "PAUSED" });
+        } else if (status === "PAUSED") {
+          set({ status: "PLAYING" });
+        }
+      },
 
-  tick: () => {
-    const {
-      status,
-      baseHp,
-      tickEnemies,
-      processCombat,
-      spawnEnemies,
-      lastSpawnTime,
-    } = get();
-    const now = Date.now();
-
-    if (status !== "PLAYING") return;
-
-    if (baseHp <= 0) {
-      set({ status: "GAME_OVER" });
-      return;
-    }
-
-    if (now - lastSpawnTime > 3000) {
-      spawnEnemies();
-      set({ lastSpawnTime: now });
-    }
-
-    tickEnemies();
-    processCombat();
-  },
-
-  processCombat: () => {
-    const { robots, enemies, scrap } = get();
-    const now = Date.now();
-
-    const sortedEnemies = [...enemies].sort(
-      (a, b) => b.position.y - a.position.y,
-    );
-
-    const updatedRobots = robots.map((robot) => {
-      if (
-        robot.lastTargetPos &&
-        robot.lastShot &&
-        now - robot.lastShot > robot.fireRate
-      ) {
-        return { ...robot, lastTargetPos: null };
-      }
-
-      if (robot.lastShot && now - robot.lastShot < robot.fireRate) return robot;
-
-      const target = sortedEnemies.find(
-        (enemy) => enemy.hp > 0 && enemy.position.y > 0,
-      );
-
-      if (target) {
-        target.hp -= robot.damage;
-        return {
-          ...robot,
-          lastShot: now,
-          lastTargetPos: { ...target.position },
-        };
-      }
-
-      return robot;
-    });
-
-    const deadEnemies = enemies.filter((e) => e.hp <= 0);
-    const scrapGained = deadEnemies.reduce((acc, e) => acc + e.reward, 0);
-
-    const survivingEnemies = enemies.filter((e) => e.hp > 0);
-
-    set({
-      robots: updatedRobots,
-      enemies: survivingEnemies,
-      scrap: scrap + scrapGained,
-    });
-  },
-
-  deployToBase: (baseId, type: Robot["type"]) => {
-    const { bases, robots } = get();
-    const targetBase = bases.find((b: Base) => b.id === baseId);
-
-    if (!targetBase || !targetBase.isUnlocked || targetBase.occupantId) return;
-
-    const template = REGISTRY.ROBOTS[type];
-
-    const newRobot: Robot = {
-      ...template,
-      id: crypto.randomUUID(),
-      level: 1,
-      position: { x: targetBase.x, y: targetBase.y },
-      type,
-      lastShot: 0,
-      lastTargetPos: null,
-    };
-
-    set({
-      robots: [...robots, newRobot],
-      bases: bases.map((b) =>
-        b.id === baseId ? { ...b, occupantId: newRobot.id } : b,
-      ),
-    });
-  },
-
-  spawnEnemies: () => {
-    const { enemies } = get();
-
-    const enemyEntries = Object.entries(REGISTRY.ENEMIES);
-    const totalWeight = enemyEntries.reduce(
-      (acc, [_, config]) => acc + config.spawnChance,
-      0,
-    );
-    let random = Math.random() * totalWeight;
-    let selectedType: Enemy["type"] = "MINION";
-
-    for (const [type, config] of enemyEntries) {
-      if (random < config.spawnChance) {
-        selectedType = type as Enemy["type"];
-        break;
-      }
-      random -= config.spawnChance;
-    }
-
-    const stats = REGISTRY.ENEMIES[selectedType];
-
-    const newEnemy: Enemy = {
-      ...stats,
-      id: crypto.randomUUID(),
-      position: { x: Math.random() * 80 + 10, y: -5 },
-    };
-
-    set({ enemies: [...enemies, newEnemy] });
-  },
-
-  tickEnemies: () => {
-    const { enemies, takeDamage } = get();
-
-    set(() => ({
-      enemies: enemies
-        .map((e) => ({
-          ...e,
-          position: { ...e.position, y: e.position.y + e.speed },
-        }))
-        .filter((e) => {
-          if (e.position.y >= 83) {
-            takeDamage(e.damage);
-            return false;
-          }
-          return true;
+      resetGame: () =>
+        set({
+          status: "IDLE",
+          wave: 0,
+          baseHp: 100,
+          robots: [],
+          enemies: [],
+          bases: get().bases.map((b) => ({ ...b, occupantId: null })),
+          lastSpawnTime: Date.now(),
         }),
-    }));
-  },
-}));
+
+      addScrap: (amount) => set((state) => ({ scrap: state.scrap + amount })),
+
+      takeDamage: (damage: Robot["damage"]) => {
+        const { baseHp } = get();
+
+        set(() => ({ baseHp: baseHp - damage }));
+      },
+
+      tick: () => {
+        const {
+          status,
+          baseHp,
+          tickEnemies,
+          processCombat,
+          spawnEnemies,
+          lastSpawnTime,
+        } = get();
+        const now = Date.now();
+
+        if (status !== "PLAYING") return;
+
+        if (baseHp <= 0) {
+          set({ status: "GAME_OVER" });
+          return;
+        }
+
+        if (now - lastSpawnTime > 3000) {
+          spawnEnemies();
+          set({ lastSpawnTime: now });
+        }
+
+        tickEnemies();
+        processCombat();
+      },
+
+      processCombat: () => {
+        const { robots, enemies, scrap } = get();
+        const now = Date.now();
+
+        const sortedEnemies = [...enemies].sort(
+          (a, b) => b.position.y - a.position.y,
+        );
+
+        const updatedRobots = robots.map((robot) => {
+          if (
+            robot.lastTargetPos &&
+            robot.lastShot &&
+            now - robot.lastShot > robot.fireRate
+          ) {
+            return { ...robot, lastTargetPos: null };
+          }
+
+          if (robot.lastShot && now - robot.lastShot < robot.fireRate)
+            return robot;
+
+          const target = sortedEnemies.find(
+            (enemy) => enemy.hp > 0 && enemy.position.y > 0,
+          );
+
+          if (target) {
+            target.hp -= robot.damage;
+            return {
+              ...robot,
+              lastShot: now,
+              lastTargetPos: { ...target.position },
+            };
+          }
+
+          return robot;
+        });
+
+        const deadEnemies = enemies.filter((e) => e.hp <= 0);
+        const scrapGained = deadEnemies.reduce((acc, e) => acc + e.reward, 0);
+
+        const survivingEnemies = enemies.filter((e) => e.hp > 0);
+
+        set({
+          robots: updatedRobots,
+          enemies: survivingEnemies,
+          scrap: scrap + scrapGained,
+        });
+      },
+
+      deployToBase: (baseId, type: Robot["type"]) => {
+        const { bases, robots } = get();
+        const targetBase = bases.find((b: Base) => b.id === baseId);
+
+        if (!targetBase || !targetBase.isUnlocked || targetBase.occupantId)
+          return;
+
+        const template = REGISTRY.ROBOTS[type];
+
+        const newRobot: Robot = {
+          ...template,
+          id: crypto.randomUUID(),
+          level: 1,
+          position: { x: targetBase.x, y: targetBase.y },
+          type,
+          lastShot: 0,
+          lastTargetPos: null,
+        };
+
+        set({
+          robots: [...robots, newRobot],
+          bases: bases.map((b) =>
+            b.id === baseId ? { ...b, occupantId: newRobot.id } : b,
+          ),
+        });
+      },
+
+      spawnEnemies: () => {
+        const { enemies } = get();
+
+        const enemyEntries = Object.entries(REGISTRY.ENEMIES);
+        const totalWeight = enemyEntries.reduce(
+          (acc, [_, config]) => acc + config.spawnChance,
+          0,
+        );
+        let random = Math.random() * totalWeight;
+        let selectedType: Enemy["type"] = "MINION";
+
+        for (const [type, config] of enemyEntries) {
+          if (random < config.spawnChance) {
+            selectedType = type as Enemy["type"];
+            break;
+          }
+          random -= config.spawnChance;
+        }
+
+        const stats = REGISTRY.ENEMIES[selectedType];
+
+        const newEnemy: Enemy = {
+          ...stats,
+          id: crypto.randomUUID(),
+          position: { x: Math.random() * 80 + 10, y: -5 },
+        };
+
+        set({ enemies: [...enemies, newEnemy] });
+      },
+
+      tickEnemies: () => {
+        const { enemies, takeDamage } = get();
+
+        set(() => ({
+          enemies: enemies
+            .map((e) => ({
+              ...e,
+              position: { ...e.position, y: e.position.y + e.speed },
+            }))
+            .filter((e) => {
+              if (e.position.y >= 83) {
+                takeDamage(e.damage);
+                return false;
+              }
+              return true;
+            }),
+        }));
+      },
+    }),
+    {
+      name: "scrap-general-save",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ scrap: state.scrap }),
+    },
+  ),
+);
