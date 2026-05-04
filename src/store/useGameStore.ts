@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Enemy, Robot, Base } from "../types/game";
+import { REGISTRY } from "../data/registry";
 
 interface GameState {
   scrap: number;
@@ -107,11 +108,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     );
 
     const updatedRobots = robots.map((robot) => {
-      if (robot.lastTargetPos && now - robot.lastShot > robot.fireRate) {
+      if (
+        robot.lastTargetPos &&
+        robot.lastShot &&
+        now - robot.lastShot > robot.fireRate
+      ) {
         return { ...robot, lastTargetPos: null };
       }
 
-      if (now - robot.lastShot < robot.fireRate) return robot;
+      if (robot.lastShot && now - robot.lastShot < robot.fireRate) return robot;
 
       const target = sortedEnemies.find(
         (enemy) => enemy.hp > 0 && enemy.position.y > 0,
@@ -147,13 +152,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (!targetBase || !targetBase.isUnlocked || targetBase.occupantId) return;
 
+    const template = REGISTRY.ROBOTS[type];
+
     const newRobot: Robot = {
+      ...template,
       id: crypto.randomUUID(),
-      type,
-      position: { x: targetBase.x, y: targetBase.y },
       level: 1,
-      damage: 5,
-      fireRate: 1000,
+      position: { x: targetBase.x, y: targetBase.y },
+      type,
       lastShot: 0,
       lastTargetPos: null,
     };
@@ -169,17 +175,31 @@ export const useGameStore = create<GameState>((set, get) => ({
   spawnEnemies: () => {
     const { enemies } = get();
 
-    const newScout: Enemy = {
+    const enemyEntries = Object.entries(REGISTRY.ENEMIES);
+    const totalWeight = enemyEntries.reduce(
+      (acc, [_, config]) => acc + config.spawnChance,
+      0,
+    );
+    let random = Math.random() * totalWeight;
+    let selectedType: Enemy["type"] = "MINION";
+
+    for (const [type, config] of enemyEntries) {
+      if (random < config.spawnChance) {
+        selectedType = type as Enemy["type"];
+        break;
+      }
+      random -= config.spawnChance;
+    }
+
+    const stats = REGISTRY.ENEMIES[selectedType];
+
+    const newEnemy: Enemy = {
+      ...stats,
       id: crypto.randomUUID(),
-      type: "SCOUT",
-      hp: 20,
-      maxHp: 20,
-      damage: 10,
-      speed: 0.2,
-      position: { x: Math.random() * 80 + 1, y: -5 },
-      reward: 10,
+      position: { x: Math.random() * 80 + 10, y: -5 },
     };
-    set({ enemies: [...enemies, newScout] });
+
+    set({ enemies: [...enemies, newEnemy] });
   },
 
   tickEnemies: () => {

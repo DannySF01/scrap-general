@@ -1,6 +1,8 @@
+import type { LucideIcon } from "lucide-react";
+
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
-export type RobotType = "SENTRY";
-export type EnemyType = "SCOUT" | "TANK";
+export type RobotType = "SENTRY" | "SNIPER";
+export type EnemyType = "MINION" | "TANK";
 
 export interface Base {
   id: number;
@@ -14,12 +16,14 @@ export interface Base {
 export interface Robot {
   id: string;
   type: RobotType;
-  position: { x: number; y: number };
-  level: number;
+  position?: { x: number; y: number };
+  level?: number;
   damage: number;
   fireRate: number;
-  lastShot: number;
-  lastTargetPos: { x: number; y: number } | null;
+  lastShot?: number;
+  lastTargetPos?: { x: number; y: number } | null;
+  color: string;
+  icon: LucideIcon;
 }
 
 export interface Enemy {
@@ -31,6 +35,10 @@ export interface Enemy {
   speed: number;
   position: { x: number; y: number };
   reward: number;
+  spawnChance: number;
+  color: string;
+  icon: LucideIcon;
+  size: number;
 }
 
 export interface ScrapDrop {

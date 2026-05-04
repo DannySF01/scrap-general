@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Cpu, Lock, Plus } from "lucide-react";
+import { Crosshair, Lock, Plus } from "lucide-react";
 import type { Base, Robot } from "../types/game";
 import { useGameStore } from "../store/useGameStore";
 
@@ -45,7 +45,7 @@ export function Base({ base, robot }: BaseProps) {
               }
               className="text-indigo-400"
             >
-              <Cpu size={28} />
+              <Crosshair size={28} />
             </motion.div>
             <div className="w-8 h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
               <div className="bg-indigo-500 h-full w-full" />

@@ -11,7 +11,7 @@ export function LaserBeam({
     <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
       <motion.line
         x1={`${from.x}%`}
-        y1={`${from.y}%`}
+        y1={`${from.y - 5}%`}
         x2={`${to.x}%`}
         y2={`${to.y}%`}
         stroke="#818cf8"
@@ -22,7 +22,7 @@ export function LaserBeam({
       />
       <motion.line
         x1={`${from.x}%`}
-        y1={`${from.y}%`}
+        y1={`${from.y - 5}%`}
         x2={`${to.x}%`}
         y2={`${to.y}%`}
         stroke="#c7d2fe"
