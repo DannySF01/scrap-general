@@ -1,9 +1,10 @@
-import type { Enemy, Robot } from "../types/game";
-import { Crosshair, Shield, Target, Triangle } from "lucide-react";
+import type { Ability, Enemy, Robot } from "../types/game";
+import { Crosshair, Shield, Target, Triangle, Zap } from "lucide-react";
 
 export const REGISTRY: {
   ROBOTS: Record<Robot["type"], Robot>;
   ENEMIES: Record<Enemy["type"], Enemy>;
+  ABILITIES: Record<string, Ability>;
 } = {
   ROBOTS: {
     SENTRY: {
@@ -51,6 +52,17 @@ export const REGISTRY: {
       color: "sky",
       icon: Shield,
       size: 30,
+    },
+  },
+  ABILITIES: {
+    EMP: {
+      id: "EMP",
+      type: "EMP",
+      cost: 150,
+      cooldown: 15000,
+      duration: 3000,
+      color: "cyan",
+      icon: Zap,
     },
   },
 };

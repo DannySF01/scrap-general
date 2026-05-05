@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import type { Enemy, Robot, Base, GameStatus } from "../types/game";
+import type {
+  Enemy,
+  Robot,
+  Base,
+  GameStatus,
+  AbilityType,
+} from "../types/game";
 import { REGISTRY } from "../data/registry";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -19,6 +25,11 @@ interface GameState {
   selectRobot: (type: Robot["type"]) => void;
 
   lastSpawnTime: number;
+
+  abilityActive: AbilityType | null;
+  cooldowns: Record<AbilityType, number>;
+  triggerAbility: (ability: AbilityType) => void;
+  tickCooldowns: (dt: number) => void;
 
   startGame: () => void;
   togglePause: () => void;
@@ -92,6 +103,9 @@ export const useGameStore = create<GameState>()(
 
       lastSpawnTime: Date.now(),
 
+      abilityActive: null,
+      cooldowns: {} as Record<AbilityType, number>,
+
       startGame: () => set({ status: "PLAYING" }),
 
       togglePause: () => {
@@ -129,6 +143,7 @@ export const useGameStore = create<GameState>()(
           baseHp,
           tickEnemies,
           processCombat,
+          tickCooldowns,
           spawnEnemies,
           lastSpawnTime,
         } = get();
@@ -146,8 +161,54 @@ export const useGameStore = create<GameState>()(
           set({ lastSpawnTime: now });
         }
 
+        const dt = 60;
+        tickCooldowns(dt);
         tickEnemies();
         processCombat();
+      },
+
+      tickCooldowns: (dt) => {
+        const { cooldowns, status } = get();
+        if (status !== "PLAYING") return;
+
+        const nextCooldowns = { ...cooldowns };
+        let hasChanged = false;
+
+        for (const key in nextCooldowns) {
+          const type = key as AbilityType;
+          if (nextCooldowns[type] > 0) {
+            nextCooldowns[type] = Math.max(0, nextCooldowns[type] - dt);
+            hasChanged = true;
+          }
+        }
+
+        if (hasChanged) set({ cooldowns: nextCooldowns });
+      },
+
+      triggerAbility: (type) => {
+        const { scrap, cooldowns, enemies } = get();
+        const config = REGISTRY.ABILITIES[type];
+        const now = Date.now();
+
+        if (scrap < config.cost || (cooldowns[type] && now < cooldowns[type]))
+          return;
+
+        set({
+          scrap: scrap - config.cost,
+          cooldowns: { ...cooldowns, [type]: config.cooldown },
+          abilityActive: type,
+        });
+
+        if (type === "EMP") {
+          set({ enemies: enemies.map((e) => ({ ...e, speed: 0 })) });
+
+          setTimeout(() => {
+            set({
+              abilityActive: null,
+              enemies: [...enemies],
+            });
+          }, config.duration);
+        }
       },
 
       processCombat: () => {
@@ -262,7 +323,9 @@ export const useGameStore = create<GameState>()(
       },
 
       tickEnemies: () => {
-        const { enemies, takeDamage } = get();
+        const { enemies, takeDamage, abilityActive } = get();
+
+        if (abilityActive === "EMP") return;
 
         set(() => ({
           enemies: enemies

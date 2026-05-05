@@ -6,9 +6,18 @@ import { useGameLoop } from "./hooks/useGameLoop";
 import { GameOverlay } from "./components/GameOverlay";
 import { useEffect } from "react";
 import { DeploymentHub } from "./components/DeploymentHub";
+import { REGISTRY } from "./data/registry";
 
 export default function App() {
-  const { scrap, wave, luck, status, togglePause } = useGameStore();
+  const {
+    scrap,
+    wave,
+    luck,
+    status,
+    abilityActive,
+    togglePause,
+    triggerAbility,
+  } = useGameStore();
 
   useGameLoop();
 
@@ -57,34 +66,10 @@ export default function App() {
       </main>
 
       <footer className="grid grid-cols-4 gap-4 h-28">
-        <ActionSlot
-          icon={null}
-          label="Ability 1"
-          cost="0"
-          hotkey="1"
-          isLocked
-        />
-        <ActionSlot
-          icon={null}
-          label="Ability 2"
-          cost="0"
-          hotkey="2"
-          isLocked
-        />
-        <ActionSlot
-          icon={null}
-          label="Ability 3"
-          cost="0"
-          hotkey="3"
-          isLocked
-        />
-        <ActionSlot
-          icon={null}
-          label="Ability 4"
-          cost="0"
-          hotkey="4"
-          isLocked
-        />
+        <ActionSlot abilityId="EMP" hotkey="1" />
+        <ActionSlot abilityId={undefined} hotkey="2" />
+        <ActionSlot abilityId={undefined} hotkey="3" />
+        <ActionSlot abilityId={undefined} hotkey="4" />
       </footer>
     </div>
   );

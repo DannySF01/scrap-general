@@ -4,6 +4,7 @@ export type GameStatus = "IDLE" | "PLAYING" | "PAUSED" | "GAME_OVER";
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
 export type RobotType = "SENTRY" | "SNIPER";
 export type EnemyType = "MINION" | "TANK";
+export type AbilityType = "EMP";
 
 export interface Base {
   id: number;
@@ -12,6 +13,16 @@ export interface Base {
   y: number;
   isUnlocked: boolean;
   occupantId: string | null;
+}
+
+export interface Ability {
+  id: string;
+  type: AbilityType;
+  cost: number;
+  cooldown: number;
+  duration: number;
+  color: string;
+  icon: LucideIcon;
 }
 
 export interface Robot {
@@ -49,12 +60,4 @@ export interface ScrapDrop {
   x: number;
   y: number;
   isCollected: boolean;
-}
-
-export interface Ability {
-  id: string;
-  name: string;
-  cooldown: number;
-  lastUsed: number;
-  isActive: boolean;
 }
