@@ -50,7 +50,7 @@ export function GameOverlay() {
                 onClick={resetGame}
                 className="px-8 py-3 bg-red-600 hover:bg-red-500 font-bold rounded-lg"
               >
-                RESTART
+                Main Menu
               </button>
             </div>
           </>

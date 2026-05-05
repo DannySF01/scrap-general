@@ -6,18 +6,10 @@ import { useGameLoop } from "./hooks/useGameLoop";
 import { GameOverlay } from "./components/GameOverlay";
 import { useEffect } from "react";
 import { DeploymentHub } from "./components/DeploymentHub";
-import { REGISTRY } from "./data/registry";
+import { MainMenu } from "./components/MainMenu";
 
 export default function App() {
-  const {
-    scrap,
-    wave,
-    luck,
-    status,
-    abilityActive,
-    togglePause,
-    triggerAbility,
-  } = useGameStore();
+  const { scrap, wave, luck, status, togglePause } = useGameStore();
 
   useGameLoop();
 
@@ -60,6 +52,7 @@ export default function App() {
       </header>
 
       <main className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-xl relative overflow-hidden group">
+        <MainMenu />
         <Arena />
         <GameOverlay />
         <DeploymentHub />
