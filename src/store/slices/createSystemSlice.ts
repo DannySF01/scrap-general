@@ -1,0 +1,61 @@
+import type { StateCreator } from "zustand";
+import type { GameState } from "../useGameStore";
+import type { GameStatus } from "../../types/game";
+
+export interface SystemSlice {
+  status: GameStatus;
+  scrap: number;
+  luck: number;
+  wave: number;
+  baseHp: number;
+
+  startGame: () => void;
+  togglePause: () => void;
+  resetGame: () => void;
+  addScrap: (amount: number) => void;
+  takeDamage: (amount: number) => void;
+}
+
+export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
+  set,
+  get,
+) => ({
+  status: "IDLE",
+  scrap: 0,
+  luck: 0,
+  wave: 1,
+  baseHp: 100,
+
+  startGame: () => set({ status: "PLAYING" }),
+
+  togglePause: () => {
+    const { status } = get();
+    if (status === "PLAYING") set({ status: "PAUSED" });
+    else if (status === "PAUSED") set({ status: "PLAYING" });
+  },
+
+  resetGame: () =>
+    set({
+      status: "IDLE",
+      wave: 0,
+      baseHp: 100,
+      robots: [],
+      enemies: [],
+      bases: get().bases.map((b) => ({ ...b, occupantId: null })),
+      lastSpawnTime: Date.now(),
+    }),
+
+  addScrap: (amount) =>
+    set((state) => ({
+      scrap: state.scrap + amount,
+    })),
+
+  takeDamage: (amount) =>
+    set((state) => {
+      const newHp = Math.max(0, state.baseHp - amount);
+      return {
+        baseHp: newHp,
+        status: newHp <= 0 ? "GAME_OVER" : state.status,
+      };
+    }),
+});
