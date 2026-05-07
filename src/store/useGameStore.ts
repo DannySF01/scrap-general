@@ -14,11 +14,13 @@ import {
   type AbilitySlice,
 } from "./slices/createAbilitySlice";
 import { createEnemySlice, type EnemySlice } from "./slices/createEnemySlice";
+import { createMetaSlice, type MetaSlice } from "./slices/createMetaSlice";
 
 export type GameState = SystemSlice &
   CombatSlice &
   AbilitySlice &
-  EnemySlice & {
+  EnemySlice &
+  MetaSlice & {
     bases: Base[];
     tick: () => void;
   };
@@ -30,6 +32,7 @@ export const useGameStore = create<GameState>()(
       ...createCombatSlice(set, get, api),
       ...createAbilitySlice(set, get, api),
       ...createEnemySlice(set, get, api),
+      ...createMetaSlice(set, get, api),
 
       bases: [
         {
@@ -107,7 +110,7 @@ export const useGameStore = create<GameState>()(
     {
       name: "scrap-general-save",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ scrap: state.scrap }),
+      partialize: (state) => ({ scrap: state.scrap, upgrades: state.upgrades }),
     },
   ),
 );

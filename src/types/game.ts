@@ -25,6 +25,19 @@ export interface Ability {
   icon: LucideIcon;
 }
 
+export interface Upgrade {
+  id: string;
+  category: string;
+  name: string;
+  description: string;
+  maxLevel: number;
+  tier: number;
+  cost: number;
+  icon: LucideIcon;
+  requires?: string[];
+  modifiers?: Record<string, number>;
+}
+
 export interface Robot {
   id: string;
   type: RobotType;

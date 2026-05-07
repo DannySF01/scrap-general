@@ -2,13 +2,17 @@ import type { StateCreator } from "zustand";
 import type { GameState } from "../useGameStore";
 import type { GameStatus } from "../../types/game";
 
+export type MenuView = "MAIN" | "TECH_TREE" | "INTEL";
+
 export interface SystemSlice {
   status: GameStatus;
   scrap: number;
   luck: number;
   wave: number;
   baseHp: number;
+  currentView: MenuView;
 
+  setView: (view: MenuView) => void;
   startGame: () => void;
   togglePause: () => void;
   resetGame: () => void;
@@ -25,6 +29,9 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
   luck: 0,
   wave: 1,
   baseHp: 100,
+  currentView: "MAIN",
+
+  setView: (view) => set({ currentView: view }),
 
   startGame: () => set({ status: "PLAYING" }),
 
