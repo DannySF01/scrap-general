@@ -2,6 +2,7 @@ import type { StateCreator } from "zustand";
 import type { Base, Robot } from "../../types/game";
 import type { GameState } from "../useGameStore";
 import { REGISTRY } from "../../data/registry";
+import { resolveStat } from "../../utils/stats";
 
 export interface CombatSlice {
   robots: Robot[];
@@ -9,6 +10,8 @@ export interface CombatSlice {
   selectRobot: (type: Robot["type"]) => void;
   deployToBase: (baseId: number, type: Robot["type"]) => void;
   processCombat: () => void;
+  vfxEvents: { id: number; type: "CRIT"; pos: { x: number; y: number } }[];
+  removeVfx: (id: number) => void;
 }
 
 export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
@@ -17,6 +20,9 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
 ) => ({
   robots: [],
   selectedRobotType: "SENTRY",
+  vfxEvents: [],
+  removeVfx: (id: number) =>
+    set({ vfxEvents: get().vfxEvents.filter((e) => e.id !== id) }),
 
   selectRobot: (type: Robot["type"]) => set({ selectedRobotType: type }),
 
@@ -54,7 +60,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
   },
 
   processCombat: () => {
-    const { robots, enemies, scrap } = get();
+    const { robots, enemies, scrap, upgrades } = get();
     const now = Date.now();
 
     const sortedEnemies = [...enemies].sort(
@@ -62,6 +68,13 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     );
 
     const updatedRobots = robots.map((robot) => {
+      const currentFireRate = resolveStat("fireRate", robot.fireRate, upgrades);
+
+      const baseDamage = resolveStat("damage", robot.damage, upgrades);
+      const sentryBonus =
+        robot.type === "SENTRY" ? resolveStat("sentryDamage", 0, upgrades) : 0;
+      const finalDamage = baseDamage + sentryBonus;
+
       if (
         robot.lastTargetPos &&
         robot.lastShot &&
@@ -70,14 +83,33 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         return { ...robot, lastTargetPos: null };
       }
 
-      if (robot.lastShot && now - robot.lastShot < robot.fireRate) return robot;
+      // on cooldown
+      if (robot.lastShot && now - robot.lastShot < currentFireRate)
+        return robot;
 
       const target = sortedEnemies.find(
         (enemy) => enemy.hp > 0 && enemy.position.y > 0,
       );
 
       if (target) {
-        target.hp -= robot.damage;
+        const critChance = resolveStat("critChance", 0, upgrades);
+        const isCrit = Math.random() < critChance;
+        const damageToApply = isCrit ? finalDamage * 2 : finalDamage;
+
+        target.hp -= damageToApply;
+
+        if (isCrit) {
+          set((state) => ({
+            vfxEvents: [
+              ...state.vfxEvents,
+              {
+                id: Date.now(),
+                type: "CRIT",
+                pos: target.position,
+              },
+            ],
+          }));
+        }
         return {
           ...robot,
           lastShot: now,

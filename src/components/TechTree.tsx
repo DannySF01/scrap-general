@@ -6,17 +6,19 @@ import type { Upgrade } from "../types/game";
 import TechConnection from "./TechConnection";
 import TechNode from "./TechNode";
 import { ArrowLeft } from "lucide-react";
+import { getProjectedStat } from "../utils/stats";
+
+interface HoveredNode {
+  node: Upgrade;
+  pos: { x: number; y: number };
+}
 
 export function TechTree() {
   const { setView, scrap, upgrades, purchaseUpgrade } = useGameStore();
-  const [hoveredNode, setHoveredNode] = useState<{
-    node: Upgrade;
-    pos: { x: number; y: number };
-  } | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<HoveredNode | null>(null);
 
-  const isNodeLocked = hoveredNode?.node.requires?.some(
-    (reqId) => (upgrades[reqId] || 0) === 0,
-  );
+  const isMaxed =
+    hoveredNode && hoveredNode.node.maxLevel === upgrades[hoveredNode.node.id];
 
   const categories = ["FORTRESS", "ROBOTICS", "LOGISTICS"];
 
@@ -96,66 +98,136 @@ export function TechTree() {
       </main>
 
       <AnimatePresence>
-        {hoveredNode && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: 1,
-              x: 0,
-              left: hoveredNode.pos.x + 10,
-              top: hoveredNode.pos.y,
-            }}
-            exit={{ opacity: 0, x: -10 }}
-            className="fixed  right-12 w-80 bg-slate-900/95 border-2 border-indigo-500/50 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50 backdrop-blur-md"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-black text-white italic">
-                {hoveredNode.node.name}
-              </h2>
-              <hoveredNode.node.icon className="text-indigo-400" size={24} />
-            </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed mb-6">
-              {hoveredNode.node.description}
-            </p>
-
-            {!isNodeLocked ? (
-              <>
-                <div className="flex justify-between items-end border-t border-slate-800 pt-4">
-                  <div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">
-                      Cost
-                    </p>
-                    <p className="text-emerald-400 font-black">
-                      {hoveredNode.node.cost} SC
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">
-                      Level
-                    </p>
-                    <p className="text-indigo-400 font-black">
-                      {upgrades[hoveredNode.node.id] || 0} /{" "}
-                      {hoveredNode.node.maxLevel}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-4 text-xs text-center text-slate-500 animate-pulse">
-                  CLICK TO RESEARCH
-                </p>
-              </>
-            ) : (
-              <div className="flex justify-between items-end border-t border-slate-800 pt-4">
-                <div>
-                  <p className="text-xs text-red-500 font-bold uppercase">
-                    Needs {hoveredNode.node.requires} to unlock
-                  </p>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
+        <Tooltip />
       </AnimatePresence>
     </div>
   );
+
+  function Tooltip() {
+    if (!hoveredNode) return null;
+
+    const isNodeLocked = hoveredNode.node.requires?.some(
+      (reqId) => (upgrades[reqId] || 0) === 0,
+    );
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: 1,
+          x: 0,
+          left: hoveredNode.pos.x + 10,
+          top: hoveredNode.pos.y,
+        }}
+        exit={{ opacity: 0, x: -10 }}
+        className="fixed  right-12 w-80 bg-slate-900/95 border-2 border-indigo-500/50 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50 backdrop-blur-md"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-black text-white italic">
+            {hoveredNode.node.name}
+          </h2>
+          <hoveredNode.node.icon className="text-indigo-400" size={24} />
+        </div>
+
+        <p className="text-xs text-slate-300 leading-relaxed mb-4">
+          {hoveredNode.node.description}
+        </p>
+
+        {!isNodeLocked && <Projection />}
+
+        {!isNodeLocked ? (
+          <>
+            <div className="flex justify-between items-center border-t border-slate-800 pt-4">
+              {!isMaxed ? (
+                <div>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">
+                    Cost
+                  </p>
+                  <p className="text-emerald-400 font-black">
+                    {hoveredNode.node.cost} SC
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-xs text-emerald-400 font-bold uppercase">
+                    Upgrade already Maxed
+                  </p>
+                </div>
+              )}
+              <div className="text-right">
+                <p className="text-[10px] text-slate-500 font-bold uppercase">
+                  Level
+                </p>
+                <p className="text-indigo-400 font-black">
+                  {upgrades[hoveredNode.node.id] || 0} /{" "}
+                  {hoveredNode.node.maxLevel}
+                </p>
+              </div>
+            </div>
+
+            {!isMaxed && (
+              <p className="mt-4 text-xs text-center text-slate-500 animate-pulse">
+                CLICK TO RESEARCH
+              </p>
+            )}
+          </>
+        ) : (
+          <div className="flex justify-between items-end border-t border-slate-800 pt-4">
+            <div>
+              <p className="text-xs text-red-500 font-bold uppercase">
+                Needs {hoveredNode.node.requires} to unlock
+              </p>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    );
+  }
+
+  function Projection() {
+    if (!hoveredNode || !hoveredNode.node.modifiers) return null;
+
+    const projections = getProjectedStat(hoveredNode.node.id, upgrades);
+
+    return (
+      <motion.div>
+        {projections.map((stat) => (
+          <div
+            key={stat.label}
+            className="bg-slate-950/50 p-3 border border-indigo-500/20 rounded-md"
+          >
+            <p className="text-[9px] font-black text-indigo-400 tracking-widest mb-1">
+              {stat.label}
+            </p>
+
+            {!isMaxed ? (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500 font-black">
+                  {stat.label === "FIRERATE"
+                    ? `${(1000 / stat.current).toFixed(1)}x`
+                    : stat.current.toFixed(1)}
+                </span>
+
+                <div className="text-indigo-500 text-[10px]">{">>"}</div>
+
+                <span className="text-xs text-emerald-400 font-black">
+                  {stat.label === "FIRERATE"
+                    ? `${(1000 / stat.projected).toFixed(1)}x`
+                    : stat.projected.toFixed(1)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500 font-black">
+                  {stat.label === "FIRERATE"
+                    ? `${(1000 / stat.current).toFixed(1)}x`
+                    : stat.current.toFixed(1)}
+                </span>
+              </div>
+            )}
+          </div>
+        ))}
+      </motion.div>
+    );
+  }
 }

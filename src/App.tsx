@@ -7,6 +7,8 @@ import { GameOverlay } from "./components/GameOverlay";
 import { useEffect } from "react";
 import { DeploymentHub } from "./components/DeploymentHub";
 import { MainMenu } from "./components/MainMenu";
+import { StatPanel } from "./components/StatPanel";
+import { VfxManager } from "./components/VfxManager";
 
 export default function App() {
   const { scrap, luck, status, togglePause } = useGameStore();
@@ -46,13 +48,15 @@ export default function App() {
 
       <main className="absolute inset-0 ">
         <Arena />
+        <VfxManager />
         <MainMenu />
         <GameOverlay />
         <DeploymentHub />
         <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_150px_rgba(0,0,0,0.5)] z-10" />
       </main>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col gap-2 items-center">
+        <StatPanel />
         <div className="relative bg-slate-950/90 border-2 border-slate-800 p-2 flex gap-2 items-center rounded-xl shadow-2xl backdrop-blur-xl">
           <div className="flex gap-2">
             <ActionSlot abilityId="EMP" hotkey="1" />
