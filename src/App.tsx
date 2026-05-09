@@ -9,8 +9,7 @@ import { DeploymentHub } from "./components/DeploymentHub";
 import { MainMenu } from "./components/MainMenu";
 
 export default function App() {
-  const { scrap, wave, luck, status, togglePause } = useGameStore();
-
+  const { scrap, luck, status, togglePause } = useGameStore();
   useGameLoop();
 
   useEffect(() => {
@@ -31,39 +30,38 @@ export default function App() {
   }, [status, togglePause]);
 
   return (
-    <div className="h-screen w-300 mx-auto flex flex-col bg-slate-950 p-4 gap-4 overflow-hidden relative">
-      <header className="flex justify-between items-center bg-slate-900 border-2 border-slate-800 p-4 rounded-xl">
-        <div className="flex gap-10">
-          <Stat
-            label="SCRAP"
-            value={scrap.toLocaleString()}
-            color="text-scrap"
-          />
-          <Stat label="LUCK" value={`${luck}`} color="text-energy" />
+    <div className="h-screen w-screen bg-slate-950 overflow-hidden relative font-mono selection:bg-indigo-500/30">
+      <div className="absolute top-6 left-6 right-6 z-1 pointer-events-none flex justify-between items-start">
+        <div className="flex flex-col gap-1 pointer-events-auto">
+          <div className="bg-slate-900/80 border-l-2 border-indigo-500 p-3 backdrop-blur-sm shadow-xl">
+            <Stat
+              label="SCRAP"
+              value={scrap.toLocaleString()}
+              color="text-emerald-400"
+            />
+            <Stat label="LUCK" value={`${luck}`} color="text-sky-400" />
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-[10px] text-slate-500 font-black tracking-widest uppercase">
-            Sector Threat
-          </p>
-          <p className="text-3xl font-black text-danger leading-none">
-            WAVE {wave}
-          </p>
-        </div>
-      </header>
+      </div>
 
-      <main className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-xl relative overflow-hidden group">
-        <MainMenu />
+      <main className="absolute inset-0 ">
         <Arena />
+        <MainMenu />
         <GameOverlay />
         <DeploymentHub />
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_150px_rgba(0,0,0,0.5)] z-10" />
       </main>
 
-      <footer className="grid grid-cols-4 gap-4 h-28">
-        <ActionSlot abilityId="EMP" hotkey="1" />
-        <ActionSlot abilityId={undefined} hotkey="2" />
-        <ActionSlot abilityId={undefined} hotkey="3" />
-        <ActionSlot abilityId={undefined} hotkey="4" />
-      </footer>
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <div className="relative bg-slate-950/90 border-2 border-slate-800 p-2 flex gap-2 items-center rounded-xl shadow-2xl backdrop-blur-xl">
+          <div className="flex gap-2">
+            <ActionSlot abilityId="EMP" hotkey="1" />
+            <ActionSlot abilityId={undefined} hotkey="2" />
+            <ActionSlot abilityId={undefined} hotkey="3" />
+            <ActionSlot abilityId={undefined} hotkey="4" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

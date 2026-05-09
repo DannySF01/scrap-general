@@ -13,11 +13,11 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
 
   if (!abilityId) {
     return (
-      <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-slate-900 bg-slate-950 opacity-30 h-full w-full grayscale">
+      <div className="relative flex flex-col items-center justify-center min-w-15 min-h-15  rounded-xl border-2 border-slate-900 bg-slate-950 opacity-30 h-full w-full grayscale">
         <span className="absolute top-2 left-2 text-[10px] text-slate-800 font-bold">
           {hotkey}
         </span>
-        <Lock size={20} className="text-slate-800" />
+        <Lock size={16} className="text-slate-800" />
         <span className="text-[8px] font-black mt-2 text-slate-800 uppercase tracking-widest">
           LOCKED
         </span>
@@ -40,7 +40,7 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
     <button
       disabled={isLocked}
       onClick={() => triggerAbility(abilityId)}
-      className={`relative flex flex-col items-center justify-center rounded-xl border-2 transition-all overflow-hidden
+      className={`relative flex flex-col items-center justify-center min-w-15 h-15 rounded-xl border-2 transition-all overflow-hidden
       ${
         isLocked
           ? "bg-slate-950 border-slate-900 opacity-40 cursor-not-allowed"
@@ -77,7 +77,7 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
               : "text-slate-400 group-hover:text-indigo-400"
         }`}
       >
-        {<Icon size={24} />}
+        {<Icon size={16} />}
       </div>
 
       <span

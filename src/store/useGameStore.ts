@@ -38,7 +38,7 @@ export const useGameStore = create<GameState>()(
         {
           id: 1,
           name: "VANGUARD-01",
-          x: 20,
+          x: 10,
           y: 93,
           isUnlocked: true,
           occupantId: null,
@@ -46,7 +46,7 @@ export const useGameStore = create<GameState>()(
         {
           id: 2,
           name: "ALPHA-02",
-          x: 35,
+          x: 20,
           y: 93,
           isUnlocked: false,
           occupantId: null,
@@ -54,7 +54,7 @@ export const useGameStore = create<GameState>()(
         {
           id: 3,
           name: "CENTER-03",
-          x: 50,
+          x: 30,
           y: 93,
           isUnlocked: false,
           occupantId: null,
@@ -62,7 +62,7 @@ export const useGameStore = create<GameState>()(
         {
           id: 4,
           name: "BRAVO-04",
-          x: 65,
+          x: 70,
           y: 93,
           isUnlocked: false,
           occupantId: null,
@@ -71,6 +71,14 @@ export const useGameStore = create<GameState>()(
           id: 5,
           name: "REAR-05",
           x: 80,
+          y: 93,
+          isUnlocked: false,
+          occupantId: null,
+        },
+        {
+          id: 6,
+          name: "OMEGA-06",
+          x: 90,
           y: 93,
           isUnlocked: false,
           occupantId: null,
