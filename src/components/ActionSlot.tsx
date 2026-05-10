@@ -29,7 +29,7 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
   const Icon = config.icon;
   const cooldownEnd = cooldowns[abilityId] || 0;
   const isAffordable = scrap >= config.cost;
-  const isActive = abilityActive === abilityId;
+  const isActive = abilityActive.find((a) => a === abilityId);
   const isLocked = !abilityId || cooldownEnd > 0 || !isAffordable;
 
   const remainingTime = cooldowns[abilityId] || 0;
@@ -86,13 +86,11 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
         {config.type}
       </span>
 
-      {!isLocked && (
-        <span
-          className={`text-[10px] font-bold italic ${isAffordable ? "text-scrap" : "text-slate-600"}`}
-        >
-          {config.cost} SC
-        </span>
-      )}
+      <span
+        className={`text-[10px] font-bold italic ${!isAffordable && "text-red-500"}`}
+      >
+        {config.cost} SC
+      </span>
 
       {isActive && (
         <div className="absolute inset-0 bg-indigo-500/10 animate-pulse pointer-events-none" />

@@ -11,10 +11,11 @@ import { StatPanel } from "./components/StatPanel";
 import { VfxManager } from "./components/VfxManager";
 
 export default function App() {
-  const { scrap, luck, status, togglePause } = useGameStore();
+  const { scrap, luck, status, togglePause, syncStats } = useGameStore();
   useGameLoop();
 
   useEffect(() => {
+    syncStats();
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space") e.preventDefault();
 
@@ -60,9 +61,9 @@ export default function App() {
         <div className="relative bg-slate-950/90 border-2 border-slate-800 p-2 flex gap-2 items-center rounded-xl shadow-2xl backdrop-blur-xl">
           <div className="flex gap-2">
             <ActionSlot abilityId="EMP" hotkey="1" />
-            <ActionSlot abilityId={undefined} hotkey="2" />
-            <ActionSlot abilityId={undefined} hotkey="3" />
-            <ActionSlot abilityId={undefined} hotkey="4" />
+            <ActionSlot abilityId="REPAIR" hotkey="2" />
+            <ActionSlot abilityId="OVERCLOCK" hotkey="3" />
+            <ActionSlot abilityId="NAPALM" hotkey="4" />
           </div>
         </div>
       </div>

@@ -96,6 +96,7 @@ export const useGameStore = create<GameState>()(
           lastSpawnTime,
         } = get();
         const now = Date.now();
+        const SPAWN_INTERVAL = 2000;
 
         if (status !== "PLAYING") return;
 
@@ -104,7 +105,7 @@ export const useGameStore = create<GameState>()(
           return;
         }
 
-        if (now - lastSpawnTime > 3000) {
+        if (now - lastSpawnTime > SPAWN_INTERVAL) {
           spawnEnemies();
           set({ lastSpawnTime: now });
         }

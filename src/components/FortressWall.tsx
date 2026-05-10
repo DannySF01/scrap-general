@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
 
 export function FortressWall() {
-  const { baseHp } = useGameStore();
+  const { hp, maxHp } = useGameStore();
 
-  const healthPercent = Math.max(0, baseHp);
+  const healthPercent = Math.ceil((hp / maxHp) * 100);
   const wallColor = healthPercent > 50 ? "border-indigo-500" : "border-red-500";
 
   return (
@@ -20,7 +20,7 @@ export function FortressWall() {
         <span
           className={healthPercent < 30 ? "text-red-500" : "text-indigo-400"}
         >
-          {Math.ceil(healthPercent)}%
+          {Math.ceil(hp)} HP - {healthPercent}%
         </span>
       </div>
     </div>

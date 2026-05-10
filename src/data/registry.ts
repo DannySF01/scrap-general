@@ -1,11 +1,14 @@
 import type { Ability, Enemy, Robot, Upgrade } from "../types/game";
 import {
   Crosshair,
+  Flame,
+  Gauge,
   Search,
   Shield,
   ShieldPlus,
   Target,
   Triangle,
+  Wrench,
   Zap,
 } from "lucide-react";
 
@@ -72,6 +75,33 @@ export const REGISTRY: {
       duration: 3000,
       color: "cyan",
       icon: Zap,
+    },
+    REPAIR: {
+      id: "REPAIR",
+      type: "REPAIR",
+      cost: 300,
+      cooldown: 30000,
+      duration: 0,
+      color: "cyan",
+      icon: Wrench,
+    },
+    OVERCLOCK: {
+      id: "OVERCLOCK",
+      type: "OVERCLOCK",
+      cost: 500,
+      cooldown: 60000,
+      duration: 5000,
+      color: "cyan",
+      icon: Gauge,
+    },
+    NAPALM: {
+      id: "NAPALM",
+      type: "NAPALM",
+      cost: 0,
+      cooldown: 100000,
+      duration: 10000,
+      color: "cyan",
+      icon: Flame,
     },
   },
   UPGRADES: {

@@ -1,6 +1,7 @@
 import type { StateCreator } from "zustand";
 import type { GameState } from "../useGameStore";
 import type { GameStatus } from "../../types/game";
+import { resolveStat } from "../../utils/stats";
 
 export type MenuView = "MAIN" | "TECH_TREE" | "INTEL";
 
@@ -9,7 +10,9 @@ export interface SystemSlice {
   scrap: number;
   luck: number;
   wave: number;
+  hp: number;
   baseHp: number;
+  maxHp: number;
   currentView: MenuView;
 
   setView: (view: MenuView) => void;
@@ -18,6 +21,7 @@ export interface SystemSlice {
   resetGame: () => void;
   addScrap: (amount: number) => void;
   takeDamage: (amount: number) => void;
+  syncStats: () => void;
 }
 
 export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
@@ -28,7 +32,9 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
   scrap: 0,
   luck: 0,
   wave: 1,
+  hp: 100,
   baseHp: 100,
+  maxHp: 100,
   currentView: "MAIN",
 
   setView: (view) => set({ currentView: view }),
@@ -59,10 +65,21 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
 
   takeDamage: (amount) =>
     set((state) => {
-      const newHp = Math.max(0, state.baseHp - amount);
+      const newHp = Math.max(0, state.hp - amount);
       return {
-        baseHp: newHp,
+        hp: newHp,
         status: newHp <= 0 ? "GAME_OVER" : state.status,
       };
     }),
+
+  syncStats: () => {
+    const { upgrades, baseHp } = get();
+
+    const calculatedMax = resolveStat("maxHp", baseHp, upgrades);
+
+    set({
+      maxHp: calculatedMax,
+      hp: calculatedMax,
+    });
+  },
 });

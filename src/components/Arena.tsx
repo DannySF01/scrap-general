@@ -6,7 +6,7 @@ import { LaserBeam } from "./LaserBeam";
 import { FortressWall } from "./FortressWall";
 
 export function Arena() {
-  const { bases, robots, enemies } = useGameStore();
+  const { bases, robots, enemies, abilityActive } = useGameStore();
 
   return (
     <div className="relative w-full h-full bg-slate-950 overflow-hidden rounded-xl border-2 border-slate-800">
@@ -38,6 +38,11 @@ export function Arena() {
           <EnemyUnit key={enemy.id} enemy={enemy} />
         ))}
       </AnimatePresence>
+      {abilityActive.find((a) => a === "NAPALM") && (
+        <div className="napalm-overlay">
+          <div className="fire-glow" />
+        </div>
+      )}
       <FortressWall />
     </div>
   );

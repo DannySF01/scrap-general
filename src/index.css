@@ -20,3 +20,24 @@
     cursor: pointer;
   }
 }
+
+.napalm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 69, 0, 0.2);
+  animation: flicker 0.1s infinite;
+  pointer-events: none;
+  height: 85%;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}

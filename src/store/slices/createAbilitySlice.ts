@@ -4,7 +4,7 @@ import { REGISTRY } from "../../data/registry";
 import type { GameState } from "../useGameStore";
 
 export interface AbilitySlice {
-  abilityActive: AbilityType | null;
+  abilityActive: AbilityType[] | [];
   cooldowns: Record<AbilityType, number>;
 
   triggerAbility: (type: AbilityType) => void;
@@ -17,7 +17,7 @@ export const createAbilitySlice: StateCreator<
   [],
   AbilitySlice
 > = (set, get) => ({
-  abilityActive: null,
+  abilityActive: [],
   cooldowns: {} as Record<AbilityType, number>,
 
   triggerAbility: (type) => {
@@ -28,18 +28,31 @@ export const createAbilitySlice: StateCreator<
     if (scrap < config.cost || (cooldowns[type] && now < cooldowns[type]))
       return;
 
-    set({
-      scrap: scrap - config.cost,
-      cooldowns: { ...cooldowns, [type]: config.cooldown },
-      abilityActive: type,
-    });
+    set((state) => ({
+      scrap: state.scrap - config.cost,
+      cooldowns: { ...state.cooldowns, [type]: config.cooldown },
+      abilityActive: [...state.abilityActive, type],
+    }));
 
-    if (type === "EMP") {
+    const removeAbility = (abilityType: AbilityType) => {
       setTimeout(() => {
-        set({
-          abilityActive: null,
-        });
+        set((state) => ({
+          abilityActive: state.abilityActive.filter((a) => a !== abilityType),
+        }));
       }, config.duration);
+    };
+
+    switch (type) {
+      case "EMP":
+      case "OVERCLOCK":
+      case "NAPALM":
+        removeAbility(type);
+        break;
+      case "REPAIR":
+        set((state) => ({ hp: state.maxHp }));
+        break;
+      default:
+        break;
     }
   },
 

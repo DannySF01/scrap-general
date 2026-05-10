@@ -48,7 +48,7 @@ export function getProjectedStat(
 
   return affectedStats.map((statKey) => {
     const baseValue =
-      statKey === "fireRate" ? 1000 : statKey === "maxHp" ? 100 : 10;
+      statKey === "fireRate" ? 1000 : statKey === "maxHp" ? 100 : 0;
 
     const current = resolveStat(statKey, baseValue, upgrades);
     const projected = resolveStat(statKey, baseValue, {

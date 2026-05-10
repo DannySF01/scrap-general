@@ -51,14 +51,19 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
   tickEnemies: () => {
     const { enemies, takeDamage, abilityActive } = get();
 
-    if (abilityActive === "EMP") return;
+    if (abilityActive.find((a) => a === "EMP")) return; // FREEZE ENEMIES WHEN EMP IS ACTIVE
+    const isNapalmActive = abilityActive.find((a) => a === "NAPALM");
 
     set(() => ({
       enemies: enemies
-        .map((e) => ({
-          ...e,
-          position: { ...e.position, y: e.position.y + e.speed },
-        }))
+        .map((e) => {
+          const newHp = isNapalmActive ? e.hp - 1 : e.hp;
+          return {
+            ...e,
+            hp: newHp,
+            position: { ...e.position, y: e.position.y + e.speed },
+          };
+        })
         .filter((e) => {
           if (e.position.y >= 83) {
             takeDamage(e.damage);

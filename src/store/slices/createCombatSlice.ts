@@ -60,7 +60,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
   },
 
   processCombat: () => {
-    const { robots, enemies, scrap, upgrades } = get();
+    const { robots, enemies, scrap, upgrades, abilityActive } = get();
     const now = Date.now();
 
     const sortedEnemies = [...enemies].sort(
@@ -68,7 +68,10 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     );
 
     const updatedRobots = robots.map((robot) => {
-      const currentFireRate = resolveStat("fireRate", robot.fireRate, upgrades);
+      let currentFireRate = resolveStat("fireRate", robot.fireRate, upgrades);
+
+      if (abilityActive.find((a) => a === "OVERCLOCK")) currentFireRate /= 2;
+      else currentFireRate *= 2;
 
       const baseDamage = resolveStat("damage", robot.damage, upgrades);
       const sentryBonus =
