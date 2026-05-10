@@ -14,6 +14,7 @@ export interface CombatSlice {
     id: number;
     type: string;
     pos: { x: number; y: number };
+    radius?: number;
   }[];
   removeVfx: (id: number) => void;
 }
@@ -64,79 +65,46 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
   },
 
   processCombat: () => {
-    const { robots, enemies, scrap, upgrades, abilityActive } = get();
+    const { robots, enemies, upgrades, abilityActive } = get();
     const now = Date.now();
 
-    const sortedEnemies = [...enemies].sort(
-      (a, b) => b.position.y - a.position.y,
-    );
+    let currentEnemies = [...enemies];
+    let totalScrapGained = 0;
+    let newVfx: CombatSlice["vfxEvents"] = [];
 
     const updatedRobots = robots.map((robot) => {
-      let currentFireRate = resolveStat("fireRate", robot.fireRate, upgrades);
+      let fireRate = resolveStat("fireRate", robot.fireRate, upgrades);
 
-      if (abilityActive.find((a) => a === "OVERCLOCK")) currentFireRate /= 2;
-      else currentFireRate *= 2;
+      if (abilityActive.find((a) => a === "OVERCLOCK")) fireRate /= 2;
+      else fireRate *= 2;
 
+      // Cooldown check
+      if (robot.lastShot && now - robot.lastShot < fireRate) return robot;
+
+      // 3. Find Target (Highest Y first)
+      const target = [...currentEnemies]
+        .sort((a, b) => b.position.y - a.position.y)
+        .find((e) => e.hp > 0 && e.position.y > 0);
+
+      if (!target) return robot;
+
+      // 4. Calculate Damage
       const baseDamage = resolveStat("damage", robot.damage, upgrades);
       const sentryBonus =
         robot.type === "SENTRY" ? resolveStat("sentryDamage", 0, upgrades) : 0;
-      const finalDamage = baseDamage + sentryBonus;
+      const critChance = resolveStat("critChance", 0, upgrades);
+      const isCrit = Math.random() < critChance;
+      const damageToApply = isCrit
+        ? (baseDamage + sentryBonus) * 2
+        : baseDamage + sentryBonus;
 
-      if (
-        robot.lastTargetPos &&
-        robot.lastShot &&
-        now - robot.lastShot > robot.fireRate
-      ) {
-        return { ...robot, lastTargetPos: null };
-      }
-
-      // on cooldown
-      if (robot.lastShot && now - robot.lastShot < currentFireRate)
-        return robot;
-
-      const target = sortedEnemies.find(
-        (enemy) => enemy.hp > 0 && enemy.position.y > 0,
-      );
-
-      if (target) {
-        const critChance = resolveStat("critChance", 0, upgrades);
-        const isCrit = Math.random() < critChance;
-        const damageToApply = isCrit ? finalDamage * 2 : finalDamage;
-
-        // SHIELDER ENEMY BLOCK
-        const wasBlocked = Math.random() < 0.2; // 20% chance of being blocked
-        if (target.type === "SHIELDER" && wasBlocked) {
-          set((state) => ({
-            vfxEvents: [
-              ...state.vfxEvents,
-              {
-                id: Math.random(),
-                type: "BLOCKED",
-                pos: target.position,
-              },
-            ],
-          }));
-          return {
-            ...robot,
-            lastShot: now,
-            lastTargetPos: { ...target.position },
-          };
-        }
-
-        target.hp -= damageToApply;
-
-        if (isCrit) {
-          set((state) => ({
-            vfxEvents: [
-              ...state.vfxEvents,
-              {
-                id: Math.random(),
-                type: "CRIT",
-                pos: target.position,
-              },
-            ],
-          }));
-        }
+      // 5. Handle Block Chance
+      if (target.type === "SHIELDER" && Math.random() < 0.2) {
+        newVfx.push({
+          id: Math.random(),
+          type: "BLOCKED",
+          pos: target.position,
+        });
         return {
           ...robot,
           lastShot: now,
@@ -144,18 +112,47 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         };
       }
 
-      return robot;
+      // 6. Apply Damage (Splash / Single)
+      if (robot.splashRadius) {
+        newVfx.push({
+          id: Math.random(),
+          type: "EXPLOSION",
+          pos: target.position,
+          radius: robot.splashRadius,
+        });
+        currentEnemies = currentEnemies.map((e) => {
+          const dx = e.position.x - target.position.x;
+          const dy = e.position.y - target.position.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          const radius = robot.splashRadius ?? 0;
+          return dist <= radius ? { ...e, hp: e.hp - damageToApply } : e;
+        });
+      } else {
+        currentEnemies = currentEnemies.map((e) =>
+          e.id === target.id ? { ...e, hp: e.hp - damageToApply } : e,
+        );
+      }
+
+      if (isCrit)
+        newVfx.push({ id: Math.random(), type: "CRIT", pos: target.position });
+
+      return { ...robot, lastShot: now, lastTargetPos: { ...target.position } };
     });
 
-    const deadEnemies = enemies.filter((e) => e.hp <= 0);
-    const scrapGained = deadEnemies.reduce((acc, e) => acc + e.reward, 0);
+    const survivingEnemies = currentEnemies.filter((e) => {
+      if (e.hp <= 0) {
+        totalScrapGained += e.reward;
+        return false;
+      }
+      return true;
+    });
 
-    const survivingEnemies = enemies.filter((e) => e.hp > 0);
-
-    set({
+    set((state) => ({
       robots: updatedRobots,
       enemies: survivingEnemies,
-      scrap: scrap + scrapGained,
-    });
+      scrap: state.scrap + totalScrapGained,
+      vfxEvents: [...state.vfxEvents, ...newVfx],
+    }));
   },
 });

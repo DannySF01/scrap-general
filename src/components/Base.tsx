@@ -43,8 +43,11 @@ export function Base({ base, robot }: BaseProps) {
             <motion.div
               animate={
                 robot.lastShot && robot.lastShot > Date.now() - 100
-                  ? { scale: [1, 1.4, 1], rotate: [0, 10, -10, 0] }
-                  : {}
+                  ? {}
+                  : {
+                      scale: [1, 1.1],
+                      transform: ["none", "translateY(-1px)"],
+                    }
               }
               className={`text-${robotConfig?.color}-400`}
             >

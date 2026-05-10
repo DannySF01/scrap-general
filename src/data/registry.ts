@@ -1,8 +1,9 @@
-import { ArmoredMinion } from "../assets/ArmoredMinion";
-import { Minion } from "../assets/Minion";
-import { Overlord } from "../assets/Overlord";
-import { Regenerator } from "../assets/Regenerator";
-import { Shielder } from "../assets/Shielder";
+import { ArmoredMinion } from "../assets/enemies/ArmoredMinion";
+import { Minion } from "../assets/enemies/Minion";
+import { Overlord } from "../assets/enemies/Overlord";
+import { Regenerator } from "../assets/enemies/Regenerator";
+import { Sentry } from "../assets/robots/Sentry";
+import { Shielder } from "../assets/enemies/Shielder";
 import type { Ability, Enemy, Robot, Upgrade } from "../types/game";
 import {
   Crosshair,
@@ -12,10 +13,11 @@ import {
   Shield,
   ShieldPlus,
   Target,
-  Triangle,
   Wrench,
   Zap,
 } from "lucide-react";
+import { Sniper } from "../assets/robots/Sniper";
+import { Launcher } from "../assets/robots/Launcher";
 
 export const REGISTRY: {
   ROBOTS: Record<Robot["type"], Robot>;
@@ -30,7 +32,7 @@ export const REGISTRY: {
       damage: 5,
       fireRate: 800,
       color: "indigo",
-      icon: Crosshair,
+      icon: Sentry,
     },
     SNIPER: {
       id: "SNIPER",
@@ -38,7 +40,16 @@ export const REGISTRY: {
       damage: 25,
       fireRate: 2500,
       color: "emerald",
-      icon: Target,
+      icon: Sniper,
+    },
+    LAUNCHER: {
+      id: "LAUNCHER",
+      type: "LAUNCHER",
+      damage: 50,
+      fireRate: 3000,
+      splashRadius: 20,
+      color: "rose",
+      icon: Launcher,
     },
   },
   ENEMIES: {
@@ -90,7 +101,7 @@ export const REGISTRY: {
       hp: 200,
       maxHp: 200,
       damage: 100,
-      speed: 0.04,
+      speed: 0.05,
       reward: 100,
       position: { x: 0, y: 0 },
       spawnChance: 5,
@@ -101,16 +112,16 @@ export const REGISTRY: {
     OVERLORD: {
       id: "OVERLORD", // MINIBOSS : SPAWN 5 MINIONS EVERY 5 SECONDS
       type: "OVERLORD",
-      hp: 300,
-      maxHp: 300,
+      hp: 500,
+      maxHp: 500,
       damage: 200,
-      speed: 0.01,
+      speed: 0.03,
       reward: 500,
       position: { x: 0, y: 0 },
       spawnChance: 1,
       color: "#f59e0b",
       icon: Overlord,
-      size: 70,
+      size: 80,
     },
   },
   ABILITIES: {

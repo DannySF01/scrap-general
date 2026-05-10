@@ -71,7 +71,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
               ...minionTemplate,
               id: `enemy-${now}-${i}`,
               position: {
-                x: e.position.x - 20 + i * 5,
+                x: e.position.x - 10 + i * 5,
                 y: e.position.y,
               },
             }));

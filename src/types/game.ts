@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type GameStatus = "IDLE" | "PLAYING" | "PAUSED" | "GAME_OVER";
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
-export type RobotType = "SENTRY" | "SNIPER";
+export type RobotType = "SENTRY" | "SNIPER" | "LAUNCHER";
 export type EnemyType =
   | "MINION"
   | "ARMORED_MINION"
@@ -51,9 +51,10 @@ export interface Robot {
   damage: number;
   fireRate: number;
   lastShot?: number;
+  splashRadius?: number;
   lastTargetPos?: { x: number; y: number } | null;
   color: string;
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<any>;
 }
 
 export interface Enemy {

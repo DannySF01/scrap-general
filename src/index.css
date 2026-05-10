@@ -41,3 +41,30 @@
     opacity: 0.2;
   }
 }
+
+@keyframes explosion-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+.vfx-explosion {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(251, 146, 60, 0.8) 0%,
+    rgba(251, 146, 60, 0) 70%
+  );
+  border: 2px solid rgba(251, 146, 60, 0.5);
+  pointer-events: none;
+  animation: explosion-burst 0.5s ease-out forwards;
+}
