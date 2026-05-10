@@ -10,7 +10,11 @@ export interface CombatSlice {
   selectRobot: (type: Robot["type"]) => void;
   deployToBase: (baseId: number, type: Robot["type"]) => void;
   processCombat: () => void;
-  vfxEvents: { id: number; type: "CRIT"; pos: { x: number; y: number } }[];
+  vfxEvents: {
+    id: number;
+    type: string;
+    pos: { x: number; y: number };
+  }[];
   removeVfx: (id: number) => void;
 }
 
@@ -99,6 +103,26 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         const isCrit = Math.random() < critChance;
         const damageToApply = isCrit ? finalDamage * 2 : finalDamage;
 
+        // SHIELDER ENEMY BLOCK
+        const wasBlocked = Math.random() < 0.2; // 20% chance of being blocked
+        if (target.type === "SHIELDER" && wasBlocked) {
+          set((state) => ({
+            vfxEvents: [
+              ...state.vfxEvents,
+              {
+                id: Math.random(),
+                type: "BLOCKED",
+                pos: target.position,
+              },
+            ],
+          }));
+          return {
+            ...robot,
+            lastShot: now,
+            lastTargetPos: { ...target.position },
+          };
+        }
+
         target.hp -= damageToApply;
 
         if (isCrit) {
@@ -106,7 +130,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
             vfxEvents: [
               ...state.vfxEvents,
               {
-                id: Date.now(),
+                id: Math.random(),
                 type: "CRIT",
                 pos: target.position,
               },

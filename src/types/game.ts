@@ -3,7 +3,12 @@ import type { LucideIcon } from "lucide-react";
 export type GameStatus = "IDLE" | "PLAYING" | "PAUSED" | "GAME_OVER";
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
 export type RobotType = "SENTRY" | "SNIPER";
-export type EnemyType = "MINION" | "TANK";
+export type EnemyType =
+  | "MINION"
+  | "ARMORED_MINION"
+  | "REGENERATOR"
+  | "SHIELDER"
+  | "OVERLORD";
 export type AbilityType = "EMP" | "REPAIR" | "OVERCLOCK" | "NAPALM";
 
 export interface Base {
@@ -62,8 +67,9 @@ export interface Enemy {
   reward: number;
   spawnChance: number;
   color: string;
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<any>;
   size: number;
+  lastSpawn?: number;
 }
 
 export interface ScrapDrop {

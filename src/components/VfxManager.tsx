@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
-import { CritPopup } from "./VfxLayer";
+import { VfxLayer } from "./VfxLayer";
 
 export function VfxManager() {
   const vfxEvents = useGameStore((state) => state.vfxEvents);
@@ -10,10 +10,9 @@ export function VfxManager() {
     <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
       <AnimatePresence>
         {vfxEvents.map((vfx) => (
-          <CritPopup
+          <VfxLayer
             key={vfx.id}
-            x={vfx.pos.x}
-            y={vfx.pos.y}
+            vfx={vfx}
             onComplete={() => removeVfx(vfx.id)}
           />
         ))}

@@ -1,3 +1,8 @@
+import { ArmoredMinion } from "../assets/ArmoredMinion";
+import { Minion } from "../assets/Minion";
+import { Overlord } from "../assets/Overlord";
+import { Regenerator } from "../assets/Regenerator";
+import { Shielder } from "../assets/Shielder";
 import type { Ability, Enemy, Robot, Upgrade } from "../types/game";
 import {
   Crosshair,
@@ -48,22 +53,64 @@ export const REGISTRY: {
       position: { x: 0, y: 0 },
       spawnChance: 80,
       color: "red",
-      icon: Triangle,
+      icon: Minion,
       size: 20,
     },
-    TANK: {
-      id: "TANK",
-      type: "TANK",
-      hp: 120,
-      maxHp: 120,
-      damage: 50,
-      speed: 0.08,
-      reward: 45,
+    ARMORED_MINION: {
+      id: "ARMORED_MINION",
+      type: "ARMORED_MINION",
+      hp: 60,
+      maxHp: 60,
+      damage: 20,
+      speed: 0.12,
+      reward: 30,
       position: { x: 0, y: 0 },
       spawnChance: 20,
-      color: "sky",
-      icon: Shield,
-      size: 30,
+      color: "slate",
+      icon: ArmoredMinion,
+      size: 25,
+    },
+    REGENERATOR: {
+      id: "REGENERATOR", // PASSIVE: REGENERATE HP OVER TIME
+      type: "REGENERATOR",
+      hp: 150,
+      maxHp: 150,
+      damage: 100,
+      speed: 0.04,
+      reward: 100,
+      position: { x: 0, y: 0 },
+      spawnChance: 5,
+      color: "green",
+      icon: Regenerator,
+      size: 40,
+    },
+    SHIELDER: {
+      id: "SHIELDER", // PASSIVE: 20% TO BLOCK DAMAGE
+      type: "SHIELDER",
+      hp: 200,
+      maxHp: 200,
+      damage: 100,
+      speed: 0.04,
+      reward: 100,
+      position: { x: 0, y: 0 },
+      spawnChance: 5,
+      color: "indigo",
+      icon: Shielder,
+      size: 40,
+    },
+    OVERLORD: {
+      id: "OVERLORD", // MINIBOSS : SPAWN 5 MINIONS EVERY 5 SECONDS
+      type: "OVERLORD",
+      hp: 300,
+      maxHp: 300,
+      damage: 200,
+      speed: 0.01,
+      reward: 500,
+      position: { x: 0, y: 0 },
+      spawnChance: 1,
+      color: "#f59e0b",
+      icon: Overlord,
+      size: 70,
     },
   },
   ABILITIES: {
@@ -97,7 +144,7 @@ export const REGISTRY: {
     NAPALM: {
       id: "NAPALM",
       type: "NAPALM",
-      cost: 0,
+      cost: 1000,
       cooldown: 100000,
       duration: 10000,
       color: "cyan",
