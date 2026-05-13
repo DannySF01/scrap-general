@@ -4,7 +4,7 @@ import { Overlord } from "../assets/enemies/Overlord";
 import { Regenerator } from "../assets/enemies/Regenerator";
 import { Sentry } from "../assets/robots/Sentry";
 import { Shielder } from "../assets/enemies/Shielder";
-import type { Ability, Enemy, Robot, Upgrade } from "../types/game";
+import type { Ability, Blueprint, Enemy, Robot, Upgrade } from "../types/game";
 import {
   Crosshair,
   Flame,
@@ -24,6 +24,7 @@ export const REGISTRY: {
   ENEMIES: Record<Enemy["type"], Enemy>;
   ABILITIES: Record<string, Ability>;
   UPGRADES: Record<string, Upgrade>;
+  BLUEPRINTS: Record<string, Blueprint>;
 } = {
   ROBOTS: {
     SENTRY: {
@@ -47,7 +48,7 @@ export const REGISTRY: {
       type: "LAUNCHER",
       damage: 50,
       fireRate: 3000,
-      splashRadius: 20,
+      splashRadius: 15,
       color: "rose",
       icon: Launcher,
     },
@@ -512,6 +513,46 @@ export const REGISTRY: {
       maxLevel: 1,
       icon: Search,
       modifiers: { goldenDropChanceMult: 0.01 },
+    },
+  },
+  BLUEPRINTS: {
+    SENTRY_DAMAGE: {
+      id: "SENTRY_DAMAGE",
+      tab: "TURRETS",
+      title: "Sentry Core Overclock",
+      description:
+        "Upgrades structural kinetic output. Increases flat Sentry damage by +5.",
+      maxLevel: 5,
+      source: "SCRAP",
+      costs: { scrap: 800 },
+      modifiers: { sentryDamage: 5 },
+    },
+    SNIPER_CHASSIS: {
+      id: "SNIPER_CHASSIS",
+      tab: "TURRETS",
+      title: "Sniper Frame Schema",
+      description:
+        "Unlocks assembly authorization for long-range piercing railgun units.",
+      source: "MATERIAL_DROP",
+      costs: { scrap: 1500, alloy: 12 },
+    },
+    SLOT_ALPHA_02: {
+      id: "SLOT_ALPHA_02",
+      tab: "EXPANSIONS",
+      title: "Flank Lock // Alpha-02",
+      description:
+        "Unlocks the physical defensive structural slot on the West flank array.",
+      source: "SCRAP",
+      costs: { scrap: 2000 },
+    },
+    EMP_BURST: {
+      id: "EMP_BURST",
+      tab: "ABILITIES",
+      title: "Command Power // EMP Burst",
+      description:
+        "Authorizes the active system bar capability to stun moving grids.",
+      source: "SCRAP",
+      costs: { scrap: 1200 },
     },
   },
 };

@@ -3,7 +3,7 @@ import type { GameState } from "../useGameStore";
 import type { GameStatus } from "../../types/game";
 import { resolveStat } from "../../utils/stats";
 
-export type MenuView = "MAIN" | "TECH_TREE" | "INTEL";
+export type MenuView = "MAIN" | "TECH_TREE" | "MECH_BAY" | "INTEL";
 
 export interface SystemSlice {
   status: GameStatus;

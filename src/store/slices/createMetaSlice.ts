@@ -4,7 +4,12 @@ import { REGISTRY } from "../../data/registry";
 
 export interface MetaSlice {
   upgrades: Record<string, number>;
+  unlocks: Record<string, boolean>;
   purchaseUpgrade: (id: string) => void;
+  purchaseUnlock: (
+    id: string,
+    costs: { scrap?: number; matrices?: number },
+  ) => void;
 }
 
 export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
@@ -12,6 +17,7 @@ export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
   get,
 ) => ({
   upgrades: {},
+  unlocks: {},
 
   purchaseUpgrade: (id) => {
     const { scrap, upgrades } = get();
@@ -36,4 +42,6 @@ export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
       set({ luck: (get().luck || 0) + 2 });
     }
   },
+
+  purchaseUnlock: (id) => set((state) => ({})),
 });

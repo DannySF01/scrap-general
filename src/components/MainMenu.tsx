@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
-import { Play, RotateCcw } from "lucide-react";
+import { GitFork, Hammer, Play, RotateCcw } from "lucide-react";
 import { TechTree } from "./TechTree";
+import MechBay from "./MechBay";
 
 export function MainMenu() {
   const { status, startGame, resetGame, scrap, wave, currentView, setView } =
@@ -51,16 +52,16 @@ export function MainMenu() {
 
               <MenuButton
                 onClick={() => setView("TECH_TREE")}
-                icon={<Play />}
+                icon={<GitFork />}
                 label="TECH TREE"
-                sub="UPGRADES & TECHNOLOGY"
+                sub="RESEARCH & TECHNOLOGY"
               />
 
               <MenuButton
-                onClick={() => setView("INTEL")}
-                icon={<Play />}
-                label="DATABASE"
-                sub="INTELIGENCE"
+                onClick={() => setView("MECH_BAY")}
+                icon={<Hammer />}
+                label="MECHANIC BAY"
+                sub="UPGRADES & EXPANSIONS"
               />
             </div>
           </motion.div>
@@ -74,6 +75,28 @@ export function MainMenu() {
             className="w-full h-full"
           >
             <TechTree />
+          </motion.div>
+        )}
+        {currentView === "MECH_BAY" && (
+          <motion.div
+            key="mech"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full h-full"
+          >
+            <MechBay />
+          </motion.div>
+        )}
+        {currentView === "INTEL" && (
+          <motion.div
+            key="intel"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full h-full"
+          >
+            <h1>INTEL</h1>
           </motion.div>
         )}
         <div className="absolute place-self-center bottom-8 text-[10px] text-slate-700">

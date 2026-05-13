@@ -20,6 +20,21 @@ export interface Base {
   occupantId: string | null;
 }
 
+export interface Blueprint {
+  id: string;
+  tab: "TURRETS" | "EXPANSIONS" | "ABILITIES";
+  title: string;
+  description: string;
+  maxLevel?: number;
+  source: "SCRAP" | "MATERIAL_DROP" | "MISSION_REWARD" | "STORE";
+  costs: {
+    scrap?: number;
+    alloy?: number;
+    core?: number;
+  };
+  modifiers?: Record<string, number>;
+}
+
 export interface Ability {
   id: string;
   type: AbilityType;
