@@ -43,5 +43,18 @@ export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
     }
   },
 
-  purchaseUnlock: (id) => set((state) => ({})),
+  purchaseUnlock: (id) => {
+    const { scrap, unlocks } = get();
+    if (unlocks[id]) return;
+
+    const blueprint_cost = REGISTRY.BLUEPRINTS[id].costs;
+    const cost_scrap = blueprint_cost.scrap || 0;
+
+    if (scrap >= cost_scrap) {
+      set((state) => ({
+        scrap: state.scrap - cost_scrap,
+        unlocks: { ...state.unlocks, [id]: true },
+      }));
+    }
+  },
 });

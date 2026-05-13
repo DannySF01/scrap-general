@@ -10,13 +10,15 @@ interface BaseProps {
 }
 
 export function Base({ base, robot }: BaseProps) {
-  const { deployToBase, selectedRobotType } = useGameStore();
+  const { deployToBase, selectedRobotType, unlocks } = useGameStore();
+
+  const isUnlocked = base.id === 1 || unlocks[`SLOT_${base.name}`];
 
   const robotConfig = robot ? REGISTRY.ROBOTS[robot.type] : null;
   const Icon = robotConfig ? robotConfig.icon : Plus;
 
   const handleInteraction = () => {
-    if (!base.isUnlocked) return;
+    if (!isUnlocked) return;
     deployToBase(base.id, selectedRobotType);
   };
 
@@ -31,7 +33,7 @@ export function Base({ base, robot }: BaseProps) {
         whileTap={{ scale: 0.95 }}
         className={`w-16 h-16 rounded-t-2xl border-x-2 border-t-2 transition-all cursor-pointer flex flex-col items-center justify-center
           ${
-            !base.isUnlocked
+            !isUnlocked
               ? "border-slate-800 bg-slate-900/20 opacity-40 hover:opacity-100 hover:border-energy"
               : robot
                 ? `border-${robotConfig?.color}-500 bg-slate-900/80 shadow-[0_-10px_20px_rgba(99,102,241,0.2)]`
@@ -54,7 +56,7 @@ export function Base({ base, robot }: BaseProps) {
               <Icon size={28} />
             </motion.div>
           </div>
-        ) : base.isUnlocked ? (
+        ) : isUnlocked ? (
           <Plus
             size={20}
             className="text-slate-600 group-hover:text-indigo-400 transition-colors"
@@ -70,12 +72,12 @@ export function Base({ base, robot }: BaseProps) {
       <div
         className={`px-2 py-0.5 rounded text-[8px] font-black whitespace-nowrap border transition-colors
         ${
-          base.isUnlocked
+          isUnlocked
             ? "bg-slate-900 border-slate-800 text-slate-500"
             : "bg-red-950/20 border-red-900/30 text-red-900 group-hover:text-energy group-hover:border-energy"
         }`}
       >
-        {base.isUnlocked ? (robot ? robotConfig?.type : `DEPLOY`) : `LOCKED`}
+        {isUnlocked ? (robot ? robotConfig?.type : `DEPLOY`) : `LOCKED`}
       </div>
     </div>
   );

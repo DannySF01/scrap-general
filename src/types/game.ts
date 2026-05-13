@@ -16,7 +16,6 @@ export interface Base {
   name: string;
   x: number;
   y: number;
-  isUnlocked: boolean;
   occupantId: string | null;
 }
 

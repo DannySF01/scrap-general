@@ -33,9 +33,12 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
 
   deployToBase: (baseId: number, type: Robot["type"]) => {
     const { bases, robots } = get();
-    const targetBase = bases.find((b: Base) => b.id === baseId);
 
-    if (!targetBase || !targetBase.isUnlocked) return;
+    const targetBase = bases.find((b: Base) => b.id === baseId);
+    if (!targetBase) return;
+
+    const isUnlocked = baseId === 1 || get().unlocks[`SLOT_${targetBase.name}`];
+    if (!isUnlocked) return;
 
     let updatedRobots = [...robots];
     if (targetBase.occupantId) {

@@ -269,8 +269,7 @@ function SourceBadge({ source }: { source: Blueprint["source"] }) {
     SCRAP: "border-emerald-900/40 text-emerald-500 bg-emerald-500/5",
     MATERIAL_DROP: "border-indigo-900/40 text-indigo-400 bg-indigo-400/5",
     MISSION_REWARD: "border-amber-900/40 text-amber-500 bg-amber-500/5",
-    PREMIUM_STORE:
-      "border-purple-900/40 text-purple-400 bg-purple-500/5 animate-pulse",
+    STORE: "border-purple-900/40 text-purple-400 bg-purple-500/5 animate-pulse",
   };
   return (
     <span
