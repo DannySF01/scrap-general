@@ -516,6 +516,7 @@ export const REGISTRY: {
     },
   },
   BLUEPRINTS: {
+    // TURRETS
     SENTRY_DAMAGE: {
       id: "SENTRY_DAMAGE",
       tab: "TURRETS",
@@ -525,34 +526,108 @@ export const REGISTRY: {
       maxLevel: 5,
       source: "SCRAP",
       costs: { scrap: 800 },
-      modifiers: { sentryDamage: 5 },
+      modifiers: { sentryDamageFlat: 5 },
     },
-    SNIPER_CHASSIS: {
-      id: "SNIPER_CHASSIS",
+    SNIPER_BLUEPRINT: {
+      id: "SNIPER_BLUEPRINT",
       tab: "TURRETS",
-      title: "Sniper Frame Schema",
+      title: "Sniper Blueprint",
       description:
         "Unlocks assembly authorization for long-range piercing railgun units.",
       source: "MATERIAL_DROP",
-      costs: { scrap: 1500, alloy: 12 },
+      costs: { scrap: 3000, alloy: 12 },
     },
+    ROCKET_BLUEPRINT: {
+      id: "ROCKET_BLUEPRINT",
+      tab: "TURRETS",
+      title: "Rocket Blueprint",
+      description:
+        "Unlocks assembly authorization for long-range rocket launcher units.",
+      source: "MATERIAL_DROP",
+      costs: { scrap: 7000, alloy: 30 },
+    },
+    // BASE EXPANSIONS
     SLOT_ALPHA_02: {
       id: "SLOT_ALPHA_02",
       tab: "EXPANSIONS",
       title: "Flank Lock // Alpha-02",
       description:
-        "Unlocks the physical defensive structural slot on the West flank array.",
+        "Unlocks the physical defensive structural slot on the West flank.",
       source: "SCRAP",
-      costs: { scrap: 2000 },
+      costs: { scrap: 5000 },
     },
-    EMP_BURST: {
-      id: "EMP_BURST",
-      tab: "ABILITIES",
-      title: "Command Power // EMP Burst",
+    SLOT_CENTER_03: {
+      id: "SLOT_CENTER_03",
+      tab: "EXPANSIONS",
+      title: "Center Lock // Center-03",
       description:
-        "Authorizes the active system bar capability to stun moving grids.",
+        "Unlocks the physical defensive structural slot on the West flank.",
+      source: "SCRAP",
+      costs: { scrap: 10000 },
+    },
+    SLOT_BETA_04: {
+      id: "SLOT_BRAVO_04",
+      tab: "EXPANSIONS",
+      title: "Flank Lock // BRAVO-04",
+      description:
+        "Unlocks the physical defensive structural slot on the East flank.",
+      source: "SCRAP",
+      costs: { scrap: 15000 },
+    },
+    SLOT_REAR_05: {
+      id: "SLOT_REAR_05",
+      tab: "EXPANSIONS",
+      title: "Rear Lock // Rear-05",
+      description:
+        "Unlocks the physical defensive structural slot on the East flank.",
+      source: "SCRAP",
+      costs: { scrap: 20000 },
+    },
+    SLOT_OMEGA_06: {
+      id: "SLOT_OMEGA_06",
+      tab: "EXPANSIONS",
+      title: "Rear Lock // OMEGA-06",
+      description:
+        "Unlocks the physical defensive structural slot on the East flank.",
+      source: "SCRAP",
+      costs: { scrap: 25000 },
+    },
+    // ABILITIES
+    ABILITY_EMP: {
+      id: "ABILITY_EMP",
+      tab: "ABILITIES",
+      title: "EMP BURST",
+      description:
+        "Authorizes the active system bar capability to stun moving enemies.",
       source: "SCRAP",
       costs: { scrap: 1200 },
+    },
+    ABILITY_REPAIR: {
+      id: "ABILITY_REPAIR",
+      tab: "ABILITIES",
+      title: "REPAIR",
+      description:
+        "Authorizes the active system bar capability to repair damaged units.",
+      source: "SCRAP",
+      costs: { scrap: 3000 },
+    },
+    ABILITY_OVERCLOCK: {
+      id: "ABILITY_OVERCLOCK",
+      tab: "ABILITIES",
+      title: "OVERCLOCK",
+      description:
+        "Authorizes the active system bar capability to overclock units.",
+      source: "SCRAP",
+      costs: { scrap: 5000 },
+    },
+    ABILITY_NAPALM: {
+      id: "ABILITY_NAPALM",
+      tab: "ABILITIES",
+      title: "NAPALM",
+      description:
+        "Authorizes the active system bar capability to ignite moving enemies.",
+      source: "SCRAP",
+      costs: { scrap: 8000 },
     },
   },
 };

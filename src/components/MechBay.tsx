@@ -190,7 +190,7 @@ export default function MechBay() {
                                     : "text-red-400"
                                 }
                               >
-                                {bp.costs.alloy} COILS
+                                {bp.costs.alloy} AL
                               </span>
                             )}
                           </>
@@ -203,7 +203,7 @@ export default function MechBay() {
                                 : "text-red-400"
                             }
                           >
-                            {bp.costs.core} CORE
+                            {bp.costs.core} C
                           </span>
                         )}
                         {bp.source === "STORE" && (

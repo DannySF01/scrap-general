@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 
 interface ActionSlotProps {
   abilityId?: AbilityType;
-  hotkey: string;
+  hotkey: number;
 }
 
 export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
@@ -14,11 +14,11 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
   if (!abilityId) {
     return (
       <div className="relative flex flex-col items-center justify-center min-w-15 min-h-15  rounded-xl border-2 border-slate-900 bg-slate-950 opacity-30 h-full w-full grayscale">
-        <span className="absolute top-2 left-2 text-[10px] text-slate-800 font-bold">
+        <span className="absolute top-2 left-2 text-[10px] text-slate-400 font-bold">
           {hotkey}
         </span>
-        <Lock size={16} className="text-slate-800" />
-        <span className="text-[8px] font-black mt-2 text-slate-800 uppercase tracking-widest">
+        <Lock size={16} className="text-slate-400" />
+        <span className="text-[8px] font-black mt-2 text-slate-400 uppercase tracking-widest">
           LOCKED
         </span>
       </div>

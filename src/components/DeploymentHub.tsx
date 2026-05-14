@@ -4,7 +4,11 @@ import { useGameStore } from "../store/useGameStore";
 import type { Robot } from "../types/game";
 
 export function DeploymentHub() {
-  const { selectedRobotType, selectRobot } = useGameStore();
+  const { selectedRobotType, selectRobot, unlocks } = useGameStore();
+
+  const unlockedRobots = Object.entries(REGISTRY.ROBOTS).filter(
+    ([key]) => key === "SENTRY" || unlocks[`${key}_BLUEPRINT`],
+  );
 
   return (
     <div className="absolute left-4 top-1/2 -translate-y-1/2 z-30 group">
@@ -12,7 +16,7 @@ export function DeploymentHub() {
         initial={false}
         className="group flex flex-col gap-2 p-2 bg-slate-950/90 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl transition-all duration-300 w-20 hover:w-44 overflow-hidden"
       >
-        {Object.entries(REGISTRY.ROBOTS).map(([key, config]) => {
+        {unlockedRobots.map(([key, config]) => {
           const isSelected = selectedRobotType === key;
 
           return (

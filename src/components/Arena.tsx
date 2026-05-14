@@ -4,6 +4,7 @@ import { Base } from "./Base";
 import { EnemyUnit } from "./EnemyUnit";
 import { LaserBeam } from "./LaserBeam";
 import { FortressWall } from "./FortressWall";
+import CommandCenter from "./CommandCenter";
 
 export function Arena() {
   const { bases, robots, enemies, abilityActive } = useGameStore();
@@ -44,6 +45,7 @@ export function Arena() {
         </div>
       )}
       <FortressWall />
+      <CommandCenter />
     </div>
   );
 }
