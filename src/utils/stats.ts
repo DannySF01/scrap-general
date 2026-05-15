@@ -9,7 +9,7 @@ export function resolveStat(
   let totalMultiplier = 1;
 
   Object.entries(upgrades).forEach(([id, level]) => {
-    const config = REGISTRY.UPGRADES[id];
+    const config = REGISTRY.UPGRADES[id] || REGISTRY.BLUEPRINTS[id];
     if (!config?.modifiers || level === 0) return;
 
     const flat = config.modifiers[statKey as keyof typeof config.modifiers];

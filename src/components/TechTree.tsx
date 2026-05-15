@@ -86,7 +86,7 @@ export function TechTree() {
                           level={upgrades[node.id] || 0}
                           onHover={(node, pos) => setHoveredNode({ node, pos })}
                           onLeave={() => setHoveredNode(null)}
-                          onClick={() => purchaseUpgrade(node.id)}
+                          onClick={() => purchaseUpgrade(node.id, node.cost)}
                         />
                       ))}
                   </div>
@@ -144,7 +144,7 @@ export function TechTree() {
                     Cost
                   </p>
                   <p className="text-emerald-400 font-black">
-                    {hoveredNode.node.cost} SC
+                    {hoveredNode.node.cost.scrap} SC
                   </p>
                 </div>
               ) : (

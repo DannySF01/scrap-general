@@ -1,4 +1,3 @@
-import ActionSlot from "./components/ActionSlot";
 import Stat from "./components/Stat";
 import { Arena } from "./components/Arena";
 import { useGameStore } from "./store/useGameStore";
@@ -7,7 +6,6 @@ import { GameOverlay } from "./components/GameOverlay";
 import { useEffect } from "react";
 import { DeploymentHub } from "./components/DeploymentHub";
 import { MainMenu } from "./components/MainMenu";
-import { StatPanel } from "./components/StatPanel";
 import { VfxManager } from "./components/VfxManager";
 
 export default function App() {

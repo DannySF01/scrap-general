@@ -26,7 +26,7 @@ export interface Blueprint {
   description: string;
   maxLevel?: number;
   source: "SCRAP" | "MATERIAL_DROP" | "MISSION_REWARD" | "STORE";
-  costs: {
+  cost: {
     scrap?: number;
     alloy?: number;
     core?: number;
@@ -51,7 +51,7 @@ export interface Upgrade {
   description: string;
   maxLevel: number;
   tier: number;
-  cost: number;
+  cost: { scrap: number };
   icon: LucideIcon;
   requires?: string[];
   modifiers?: Record<string, number>;

@@ -109,10 +109,14 @@ export default function MechBay() {
               const isMaxed = isProgressive && currentLvl >= (bp.maxLevel ?? 0);
               const isUnlocked = !isProgressive && !!unlocks[bp.id];
 
+              const cost_scrap = dynamicCost(bp.cost.scrap || 0, currentLvl);
+              const cost_alloy = dynamicCost(bp.cost.alloy || 0, currentLvl);
+              const cost_core = dynamicCost(bp.cost.core || 0, currentLvl);
+
               const canAfford =
-                (bp.costs.scrap ? scrap >= bp.costs.scrap : true) &&
-                (bp.costs.alloy ? mockAlloy >= bp.costs.alloy : true) &&
-                (bp.costs.core ? mockCore >= bp.costs.core : true);
+                (cost_scrap ? scrap >= cost_scrap : true) &&
+                (cost_alloy ? mockAlloy >= cost_alloy : true) &&
+                (cost_core ? mockCore >= cost_core : true);
 
               return (
                 <motion.div
@@ -166,31 +170,31 @@ export default function MechBay() {
                               canAfford ? "text-emerald-400" : "text-red-400"
                             }
                           >
-                            {bp.costs.scrap} SC
+                            {cost_scrap} SC
                           </span>
                         )}
                         {bp.source === "MATERIAL_DROP" && (
                           <>
-                            {bp.costs.scrap && (
+                            {cost_scrap && (
                               <span
                                 className={
-                                  scrap >= bp.costs.scrap
+                                  scrap >= cost_scrap
                                     ? "text-emerald-400"
                                     : "text-red-400"
                                 }
                               >
-                                {bp.costs.scrap} SC
+                                {cost_scrap} SC
                               </span>
                             )}
-                            {bp.costs.alloy && (
+                            {cost_alloy && (
                               <span
                                 className={
-                                  mockAlloy >= bp.costs.alloy
+                                  mockAlloy >= cost_alloy
                                     ? "text-indigo-400"
                                     : "text-red-400"
                                 }
                               >
-                                {bp.costs.alloy} AL
+                                {cost_alloy} AL
                               </span>
                             )}
                           </>
@@ -198,12 +202,12 @@ export default function MechBay() {
                         {bp.source === "MISSION_REWARD" && (
                           <span
                             className={
-                              mockCore >= (bp.costs.core ?? 0)
+                              mockCore >= (cost_core ?? 0)
                                 ? "text-amber-500"
                                 : "text-red-400"
                             }
                           >
-                            {bp.costs.core} C
+                            {cost_core} C
                           </span>
                         )}
                         {bp.source === "STORE" && (
@@ -219,8 +223,8 @@ export default function MechBay() {
                         disabled={!canAfford}
                         onClick={() =>
                           isProgressive
-                            ? purchaseUpgrade(bp.id)
-                            : purchaseUnlock(bp.id, bp.costs)
+                            ? purchaseUpgrade(bp.id, bp.cost)
+                            : purchaseUnlock(bp.id)
                         }
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xs transition-all shadow-md shadow-indigo-600/10 border border-transparent hover:border-indigo-400/20 disabled:border-transparent"
                       >
@@ -278,4 +282,9 @@ function SourceBadge({ source }: { source: Blueprint["source"] }) {
       {source.replace("_", " ")}
     </span>
   );
+}
+
+function dynamicCost(baseCost: number, currentLevel: number) {
+  const finalCost = baseCost * (currentLevel + 1);
+  return finalCost;
 }

@@ -1,15 +1,13 @@
 import type { StateCreator } from "zustand";
 import type { GameState } from "../useGameStore";
 import { REGISTRY } from "../../data/registry";
+import type { Blueprint } from "../../types/game";
 
 export interface MetaSlice {
   upgrades: Record<string, number>;
   unlocks: Record<string, boolean>;
-  purchaseUpgrade: (id: string) => void;
-  purchaseUnlock: (
-    id: string,
-    costs: { scrap?: number; matrices?: number },
-  ) => void;
+  purchaseUpgrade: (id: string, blueprintCosts: Blueprint["cost"]) => void;
+  purchaseUnlock: (id: string) => void;
 }
 
 export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
@@ -19,35 +17,33 @@ export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
   upgrades: {},
   unlocks: {},
 
-  purchaseUpgrade: (id) => {
+  purchaseUpgrade: (id, blueprintCosts) => {
     const { scrap, upgrades } = get();
-    const upgrade = REGISTRY.UPGRADES[id];
+
+    const config = REGISTRY.UPGRADES[id] || REGISTRY.BLUEPRINTS[id];
     const currentLevel = upgrades[id] || 0;
 
-    if (!upgrade || scrap < upgrade.cost || currentLevel >= upgrade.maxLevel)
-      return;
+    if (!config || currentLevel >= config.maxLevel) return;
 
-    set((state) => ({
-      scrap: state.scrap - upgrade.cost,
-      upgrades: { ...state.upgrades, [id]: currentLevel + 1 },
-    }));
+    // DYNAMIC COST SCALING
+    const baseCost = config.cost.scrap || blueprintCosts?.scrap || 0;
+    const finalCost = baseCost * (currentLevel + 1);
 
-    if (id === "REINFORCED_CORE") {
-      set({
-        baseHp: get().baseHp + 25,
-      });
-    }
+    if (scrap < finalCost) return;
 
-    if (id === "SALVAGE_OPTIMIZER") {
-      set({ luck: (get().luck || 0) + 2 });
-    }
+    const newUpgrades = { ...upgrades, [id]: currentLevel + 1 };
+
+    set({
+      scrap: scrap - finalCost,
+      upgrades: newUpgrades,
+    });
   },
 
   purchaseUnlock: (id) => {
     const { scrap, unlocks } = get();
     if (unlocks[id]) return;
 
-    const blueprint_cost = REGISTRY.BLUEPRINTS[id].costs;
+    const blueprint_cost = REGISTRY.BLUEPRINTS[id].cost;
     const cost_scrap = blueprint_cost.scrap || 0;
 
     if (scrap >= cost_scrap) {
