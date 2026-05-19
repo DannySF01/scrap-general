@@ -15,6 +15,7 @@ import {
 } from "./slices/createAbilitySlice";
 import { createEnemySlice, type EnemySlice } from "./slices/createEnemySlice";
 import { createMetaSlice, type MetaSlice } from "./slices/createMetaSlice";
+import { LEVELS_MANIFEST } from "../data/levels";
 
 export type GameState = SystemSlice &
   CombatSlice &
@@ -86,12 +87,16 @@ export const useGameStore = create<GameState>()(
           tickEnemies,
           processCombat,
           tickCooldowns,
+          currentLevelId,
           spawnEnemies,
+          wave,
+          waveTimeLeft,
           lastSpawnTime,
         } = get();
-        const now = Date.now();
-        const SPAWN_INTERVAL = 2000;
 
+        const now = Date.now();
+
+        // GAMEPLAY SYSTEM CHECK
         if (status !== "PLAYING") return;
 
         if (baseHp <= 0) {
@@ -99,12 +104,26 @@ export const useGameStore = create<GameState>()(
           return;
         }
 
-        if (now - lastSpawnTime > SPAWN_INTERVAL) {
-          spawnEnemies();
-          set({ lastSpawnTime: now });
-        }
+        // SPAWN ENEMIES TIMELINE
+
+        const SPAWN_INTERVAL = 1500;
+        const levelData = LEVELS_MANIFEST[currentLevelId];
+        const currentWaveConfig = levelData?.waves[wave];
+        const spawnIntervalMs =
+          currentWaveConfig?.spawnInterval || SPAWN_INTERVAL;
 
         const dt = 60;
+        const nextTimeLeft = Math.max(0, waveTimeLeft - dt);
+        set({ waveTimeLeft: nextTimeLeft });
+
+        if (nextTimeLeft > 0) {
+          if (now - lastSpawnTime > spawnIntervalMs) {
+            spawnEnemies();
+            set({ lastSpawnTime: now });
+          }
+        }
+
+        // TICK SYSTEM UPDATES
         tickCooldowns(dt);
         tickEnemies();
         processCombat();
@@ -115,8 +134,11 @@ export const useGameStore = create<GameState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         scrap: state.scrap,
+        alloy: state.alloy,
+        core: state.core,
         upgrades: state.upgrades,
         unlocks: state.unlocks,
+        currentlevelId: state.currentLevelId,
       }),
     },
   ),

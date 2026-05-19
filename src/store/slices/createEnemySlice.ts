@@ -2,13 +2,17 @@ import type { StateCreator } from "zustand";
 import type { Enemy } from "../../types/game";
 import { REGISTRY } from "../../data/registry";
 import type { GameState } from "../useGameStore";
+import { LEVELS_MANIFEST } from "../../data/levels";
 
 export interface EnemySlice {
   enemies: Enemy[];
   lastSpawnTime: number;
+  currentLevelId: number;
+  waveTimeLeft: number;
 
   spawnEnemies: () => void;
   tickEnemies: () => void;
+  selectLevel: (id: number) => void;
 }
 
 export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
@@ -17,28 +21,50 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
 ) => ({
   enemies: [],
   lastSpawnTime: Date.now(),
+  currentLevelId: 1,
+  waveTimeLeft: 30000,
+
+  selectLevel: (id) =>
+    set({ currentLevelId: id, wave: 0, waveTimeLeft: 30000 }),
 
   spawnEnemies: () => {
-    const { enemies } = get();
+    const { enemies, currentLevelId, wave } = get();
 
-    const enemyEntries = Object.entries(REGISTRY.ENEMIES);
-    const totalWeight = enemyEntries.reduce(
-      (acc, [_, config]) => acc + config.spawnChance,
-      0,
-    );
-    let random = Math.random() * totalWeight;
-    let selectedType: Enemy["type"] = "MINION";
+    // LEVEL DATA
+    const levelData = LEVELS_MANIFEST[currentLevelId];
+    if (!levelData) return;
 
-    for (const [type, config] of enemyEntries) {
-      if (random < config.spawnChance) {
-        selectedType = type as Enemy["type"];
+    const currentWaveConfig = levelData.waves[wave];
+    if (!currentWaveConfig) return;
+
+    const pool = currentWaveConfig.allowedTypes;
+    if (pool.length === 0) return;
+
+    // SPAWN ENEMIES
+    const totalWeight = pool.reduce((acc, type) => {
+      const config = REGISTRY.ENEMIES[type];
+      return acc + config.spawnChance;
+    }, 0);
+
+    if (totalWeight <= 0) return;
+
+    let randomRoll = Math.random() * totalWeight;
+    let selectedType: Enemy["type"] = pool[0];
+
+    for (const type of pool) {
+      const config = REGISTRY.ENEMIES[type];
+
+      if (randomRoll < config.spawnChance) {
+        selectedType = type;
         break;
       }
-      random -= config.spawnChance;
+      randomRoll -= config.spawnChance;
     }
 
+    // ENEMY STATS
     const stats = REGISTRY.ENEMIES[selectedType];
 
+    // ADD ENEMY
     const newEnemy: Enemy = {
       ...stats,
       id: crypto.randomUUID(),
@@ -49,12 +75,23 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
   },
 
   tickEnemies: () => {
-    const { takeDamage, abilityActive } = get();
+    const {
+      takeDamage,
+      currentLevelId,
+      wave,
+      enemies,
+      waveTimeLeft,
+      abilityActive,
+    } = get();
+
+    const levelData = LEVELS_MANIFEST[currentLevelId];
+    if (!levelData) return;
 
     if (abilityActive.find((a) => a === "EMP")) return;
     const isNapalmActive = abilityActive.find((a) => a === "NAPALM");
 
     const now = Date.now();
+
     let spawnedFromOverlord: Enemy[] = [];
 
     set((state) => {
@@ -102,5 +139,36 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         }),
       };
     });
+
+    const liveEnemies = enemies.filter((e) => e.hp > 0).length;
+    const isWaveOver = waveTimeLeft === 0 && liveEnemies === 0;
+    const hasMoreWaves = wave < levelData.waves.length - 1;
+
+    if (isWaveOver) {
+      if (hasMoreWaves) {
+        set({
+          wave: wave + 1,
+          waveTimeLeft: 30000,
+          lastSpawnTime: now,
+          enemies: [],
+        });
+      } else {
+        const nextLevelId = currentLevelId + 1;
+        const hasMoreLevels = !!LEVELS_MANIFEST[nextLevelId];
+
+        set((state) => ({
+          scrap: state.scrap + (levelData.rewards.scrap || 0),
+          alloy: (state.alloy || 0) + (levelData.rewards.alloy || 0),
+          core: (state.core || 0) + (levelData.rewards.core || 0),
+
+          currentView: !hasMoreLevels ? "MAIN" : undefined,
+          currentLevelId: hasMoreLevels ? nextLevelId : state.currentLevelId,
+          wave: 0,
+          waveTimeLeft: 30000,
+
+          // TODO : add mission rewards
+        }));
+      }
+    }
   },
 });

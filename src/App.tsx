@@ -1,4 +1,3 @@
-import Stat from "./components/Stat";
 import { Arena } from "./components/Arena";
 import { useGameStore } from "./store/useGameStore";
 import { useGameLoop } from "./hooks/useGameLoop";
@@ -9,7 +8,7 @@ import { MainMenu } from "./components/MainMenu";
 import { VfxManager } from "./components/VfxManager";
 
 export default function App() {
-  const { scrap, luck, status, togglePause, syncStats } = useGameStore();
+  const { status, togglePause, syncStats } = useGameStore();
   useGameLoop();
 
   useEffect(() => {
@@ -32,19 +31,6 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-slate-950 overflow-hidden relative font-mono selection:bg-indigo-500/30">
-      <div className="absolute top-6 left-6 right-6 z-1 pointer-events-none flex justify-between items-start">
-        <div className="flex flex-col gap-1 pointer-events-auto">
-          <div className="bg-slate-900/80 border-l-2 border-indigo-500 p-3 backdrop-blur-sm shadow-xl">
-            <Stat
-              label="SCRAP"
-              value={scrap.toLocaleString()}
-              color="text-emerald-400"
-            />
-            <Stat label="LUCK" value={`${luck}`} color="text-sky-400" />
-          </div>
-        </div>
-      </div>
-
       <main className="absolute inset-0 ">
         <Arena />
         <VfxManager />

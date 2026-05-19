@@ -15,14 +15,19 @@ import { REGISTRY } from "../data/registry";
 import type { Blueprint } from "../types/game";
 
 export default function MechBay() {
-  const { setView, scrap, upgrades, unlocks, purchaseUpgrade, purchaseUnlock } =
-    useGameStore();
+  const {
+    setView,
+    scrap,
+    alloy,
+    core,
+    upgrades,
+    unlocks,
+    purchaseUpgrade,
+    purchaseUnlock,
+  } = useGameStore();
   const [activeTab, setActiveTab] = useState<
     "TURRETS" | "EXPANSIONS" | "ABILITIES"
   >("TURRETS");
-
-  const mockAlloy = 15;
-  const mockCore = 0;
 
   const BLUEPRINTS = Object.values(REGISTRY.BLUEPRINTS);
 
@@ -63,14 +68,14 @@ export default function MechBay() {
           <div className="w-px bg-slate-800 self-stretch" />
           <MaterialDisplay
             label="Alloy"
-            val={mockAlloy}
+            val={alloy}
             unit="AL"
             color="text-indigo-400"
           />
           <div className="w-px bg-slate-800 self-stretch" />
           <MaterialDisplay
             label="Core"
-            val={mockCore}
+            val={core}
             unit="C"
             color="text-amber-500"
           />
@@ -115,8 +120,8 @@ export default function MechBay() {
 
               const canAfford =
                 (cost_scrap ? scrap >= cost_scrap : true) &&
-                (cost_alloy ? mockAlloy >= cost_alloy : true) &&
-                (cost_core ? mockCore >= cost_core : true);
+                (cost_alloy ? alloy >= cost_alloy : true) &&
+                (cost_core ? core >= cost_core : true);
 
               return (
                 <motion.div
@@ -159,64 +164,70 @@ export default function MechBay() {
                   </div>
 
                   <div className="border-t border-slate-900/60 pt-4 flex justify-between items-end mt-auto">
-                    <div>
-                      <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mb-1">
-                        Source Pipeline Cost
-                      </p>
-                      <div className="flex gap-3 text-[10px] font-black">
-                        {bp.source === "SCRAP" && (
-                          <span
-                            className={
-                              canAfford ? "text-emerald-400" : "text-red-400"
-                            }
-                          >
-                            {cost_scrap} SC
-                          </span>
-                        )}
-                        {bp.source === "MATERIAL_DROP" && (
-                          <>
-                            {cost_scrap && (
-                              <span
-                                className={
-                                  scrap >= cost_scrap
-                                    ? "text-emerald-400"
-                                    : "text-red-400"
-                                }
-                              >
-                                {cost_scrap} SC
-                              </span>
-                            )}
-                            {cost_alloy && (
-                              <span
-                                className={
-                                  mockAlloy >= cost_alloy
-                                    ? "text-indigo-400"
-                                    : "text-red-400"
-                                }
-                              >
-                                {cost_alloy} AL
-                              </span>
-                            )}
-                          </>
-                        )}
-                        {bp.source === "MISSION_REWARD" && (
-                          <span
-                            className={
-                              mockCore >= (cost_core ?? 0)
-                                ? "text-amber-500"
-                                : "text-red-400"
-                            }
-                          >
-                            {cost_core} C
-                          </span>
-                        )}
-                        {bp.source === "STORE" && (
-                          <span className="text-purple-400 font-bold tracking-widest">
-                            [ SHOP ONLY ]
-                          </span>
-                        )}
+                    {!isUnlocked && !isMaxed ? (
+                      <div>
+                        <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mb-1">
+                          Source Pipeline Cost
+                        </p>
+                        <div className="flex gap-3 text-[10px] font-black">
+                          {bp.source === "SCRAP" && (
+                            <span
+                              className={
+                                canAfford ? "text-emerald-400" : "text-red-400"
+                              }
+                            >
+                              {cost_scrap} SC
+                            </span>
+                          )}
+                          {bp.source === "MATERIAL_DROP" && (
+                            <>
+                              {cost_scrap && (
+                                <span
+                                  className={
+                                    scrap >= cost_scrap
+                                      ? "text-emerald-400"
+                                      : "text-red-400"
+                                  }
+                                >
+                                  {cost_scrap} SC
+                                </span>
+                              )}
+                              {cost_alloy && (
+                                <span
+                                  className={
+                                    alloy >= cost_alloy
+                                      ? "text-indigo-400"
+                                      : "text-red-400"
+                                  }
+                                >
+                                  {cost_alloy} AL
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {bp.source === "MISSION_REWARD" && (
+                            <span
+                              className={
+                                core >= (cost_core ?? 0)
+                                  ? "text-amber-500"
+                                  : "text-red-400"
+                              }
+                            >
+                              {cost_core} C
+                            </span>
+                          )}
+                          {bp.source === "STORE" && (
+                            <span className="text-purple-400 font-bold tracking-widest">
+                              [ SHOP ONLY ]
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <p className="text-[10px] text-emerald-500 uppercase ">
+                        {isMaxed ? "Already Max Level" : "Already Unlocked"}
+                      </p>
+                    )}
 
                     {bp.source !== "STORE" && !isUnlocked && !isMaxed && (
                       <button

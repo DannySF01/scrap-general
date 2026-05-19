@@ -8,6 +8,8 @@ export type MenuView = "MAIN" | "TECH_TREE" | "MECH_BAY" | "INTEL";
 export interface SystemSlice {
   status: GameStatus;
   scrap: number;
+  alloy: number;
+  core: number;
   luck: number;
   wave: number;
   hp: number;
@@ -18,6 +20,7 @@ export interface SystemSlice {
   setView: (view: MenuView) => void;
   startGame: () => void;
   togglePause: () => void;
+  quitGame: () => void;
   resetGame: () => void;
   addScrap: (amount: number) => void;
   takeDamage: (amount: number) => void;
@@ -29,13 +32,15 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
   get,
 ) => ({
   status: "IDLE",
+  currentView: "MAIN",
   scrap: 0,
+  alloy: 0,
+  core: 0,
   luck: 0,
-  wave: 1,
+  wave: 0,
   hp: 100,
   baseHp: 100,
   maxHp: 100,
-  currentView: "MAIN",
 
   setView: (view) => set({ currentView: view }),
 
@@ -47,15 +52,24 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
     else if (status === "PAUSED") set({ status: "PLAYING" });
   },
 
-  resetGame: () =>
+  quitGame: () =>
     set({
       status: "IDLE",
+      currentView: "MAIN",
+      bases: get().bases.map((b) => ({ ...b, occupantId: null })),
+      robots: [],
+      enemies: [],
+      wave: 0,
+      waveTimeLeft: 30000,
+    }),
+
+  resetGame: () =>
+    set({
+      currentLevelId: 1,
       wave: 0,
       baseHp: 100,
       robots: [],
       enemies: [],
-      bases: get().bases.map((b) => ({ ...b, occupantId: null })),
-      lastSpawnTime: Date.now(),
     }),
 
   addScrap: (amount) =>

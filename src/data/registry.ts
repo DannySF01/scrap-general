@@ -17,7 +17,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Sniper } from "../assets/robots/Sniper";
-import { Launcher } from "../assets/robots/Launcher";
+import { Rocket } from "../assets/robots/Rocket";
 
 export const REGISTRY: {
   ROBOTS: Record<Robot["type"], Robot>;
@@ -43,14 +43,14 @@ export const REGISTRY: {
       color: "emerald",
       icon: Sniper,
     },
-    LAUNCHER: {
-      id: "LAUNCHER",
-      type: "LAUNCHER",
+    ROCKET: {
+      id: "ROCKET",
+      type: "ROCKET",
       damage: 50,
       fireRate: 3000,
       splashRadius: 15,
       color: "rose",
-      icon: Launcher,
+      icon: Rocket,
     },
   },
   ENEMIES: {
@@ -565,7 +565,7 @@ export const REGISTRY: {
       source: "SCRAP",
       cost: { scrap: 10000 },
     },
-    SLOT_BETA_04: {
+    SLOT_BRAVO_04: {
       id: "SLOT_BRAVO_04",
       tab: "EXPANSIONS",
       title: "Flank Lock // BRAVO-04",

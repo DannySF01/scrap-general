@@ -5,7 +5,7 @@ import { TechTree } from "./TechTree";
 import MechBay from "./MechBay";
 
 export function MainMenu() {
-  const { status, startGame, resetGame, scrap, wave, currentView, setView } =
+  const { status, startGame, resetGame, currentLevelId, currentView, setView } =
     useGameStore();
 
   if (status !== "IDLE") return null;
@@ -38,16 +38,18 @@ export function MainMenu() {
               <MenuButton
                 onClick={startGame}
                 icon={<Play />}
-                label={wave > 1 ? "RESUME DEPLOYMENT" : "INITIALIZE MISSION"}
-                sub={`SECTOR WAVE: ${wave}`}
+                label={
+                  currentLevelId > 1 ? "CONTINUE MISSION" : "INITIALIZE MISSION"
+                }
+                sub={`CURRENT SECTOR: ${currentLevelId}`}
                 primary
               />
 
               <MenuButton
                 onClick={resetGame}
                 icon={<RotateCcw />}
-                label="WIPE LOCAL DATA"
-                sub={`CURRENT SCRAP: ${scrap} SC`}
+                label="RESET MISSION PROGRESS"
+                sub="START FROM THE BEGINNING"
               />
 
               <MenuButton

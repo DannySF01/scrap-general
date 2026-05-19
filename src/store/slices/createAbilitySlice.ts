@@ -49,7 +49,10 @@ export const createAbilitySlice: StateCreator<
         removeAbility(type);
         break;
       case "REPAIR":
-        set((state) => ({ hp: state.maxHp }));
+        set((state) => ({
+          hp: state.maxHp,
+          abilityActive: state.abilityActive.filter((a) => a !== "REPAIR"),
+        }));
         break;
       default:
         break;

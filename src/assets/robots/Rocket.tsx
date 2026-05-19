@@ -1,4 +1,4 @@
-export const Launcher = ({ color = "#f97316", size = 32 }) => (
+export const Rocket = ({ color = "#f97316", size = 32 }) => (
   <svg width={size} height={size} viewBox="0 0 100 100">
     <path
       d="M10 90 L30 60 H70 L90 90 Z"

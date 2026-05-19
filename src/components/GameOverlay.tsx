@@ -2,17 +2,9 @@ import { motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
 
 export function GameOverlay() {
-  const { status, startGame, resetGame, togglePause } = useGameStore();
+  const { status, startGame, quitGame, togglePause } = useGameStore();
 
-  if (status === "PLAYING")
-    return (
-      <button
-        onClick={togglePause}
-        className="absolute top-4 right-4 p-2 bg-slate-800 rounded"
-      >
-        PAUSE
-      </button>
-    );
+  if (status === "PLAYING") return;
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm">
@@ -47,7 +39,7 @@ export function GameOverlay() {
                 RESUME
               </button>
               <button
-                onClick={resetGame}
+                onClick={quitGame}
                 className="px-8 py-3 bg-red-600 hover:bg-red-500 font-bold rounded-lg"
               >
                 Main Menu
@@ -62,7 +54,7 @@ export function GameOverlay() {
               CORE BREACHED
             </h1>
             <button
-              onClick={resetGame}
+              onClick={quitGame}
               className="px-8 py-3 bg-red-600 hover:bg-red-500 font-bold rounded-lg"
             >
               REDEPLOY

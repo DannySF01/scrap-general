@@ -87,7 +87,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       // 3. Find Target (Highest Y first)
       const target = [...currentEnemies]
         .sort((a, b) => b.position.y - a.position.y)
-        .find((e) => e.hp > 0 && e.position.y > 0);
+        .find((e) => e.hp > 0 && e.position.y > 12);
 
       if (!target) return robot;
 
