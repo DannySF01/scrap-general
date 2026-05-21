@@ -139,6 +139,7 @@ export const useGameStore = create<GameState>()(
         upgrades: state.upgrades,
         unlocks: state.unlocks,
         currentlevelId: state.currentLevelId,
+        completedLevels: state.completedLevels,
       }),
     },
   ),

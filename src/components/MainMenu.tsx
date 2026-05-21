@@ -1,12 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
-import { GitFork, Hammer, Play, RotateCcw } from "lucide-react";
+import { GitFork, Hammer, Map, Play, RotateCcw } from "lucide-react";
 import { TechTree } from "./TechTree";
 import MechBay from "./MechBay";
+import { MissionSelect } from "./MissionSelect";
 
 export function MainMenu() {
   const { status, startGame, resetGame, currentLevelId, currentView, setView } =
     useGameStore();
+
+  const firstLevel = currentLevelId === "1-1";
 
   if (status !== "IDLE") return null;
 
@@ -31,18 +34,23 @@ export function MainMenu() {
             </div>
 
             <div className="flex flex-col gap-4 px-24">
-              <h2 className="text-xs font-black text-slate-600 uppercase tracking-widest border-b border-slate-900 pb-2">
-                Operations
-              </h2>
-
               <MenuButton
                 onClick={startGame}
                 icon={<Play />}
-                label={
-                  currentLevelId > 1 ? "CONTINUE MISSION" : "INITIALIZE MISSION"
+                label={!firstLevel ? "CONTINUE MISSION" : "NEW MISSION"}
+                sub={
+                  !firstLevel
+                    ? `CURRENT MISSION: ${currentLevelId}`
+                    : "BEGINNING OF YOUR JOURNEY"
                 }
-                sub={`CURRENT SECTOR: ${currentLevelId}`}
                 primary
+              />
+
+              <MenuButton
+                onClick={() => setView("MISSION_SELECT")}
+                icon={<Map />}
+                label="MISSION SELECT"
+                sub="SELECT YOUR MISSION"
               />
 
               <MenuButton
@@ -68,6 +76,17 @@ export function MainMenu() {
             </div>
           </motion.div>
         )}
+        {currentView === "MISSION_SELECT" && (
+          <motion.div
+            key="mission"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 20, opacity: 0 }}
+            className="w-full h-full"
+          >
+            <MissionSelect />
+          </motion.div>
+        )}
         {currentView === "TECH_TREE" && (
           <motion.div
             key="tech"
@@ -90,20 +109,6 @@ export function MainMenu() {
             <MechBay />
           </motion.div>
         )}
-        {currentView === "INTEL" && (
-          <motion.div
-            key="intel"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="w-full h-full"
-          >
-            <h1>INTEL</h1>
-          </motion.div>
-        )}
-        <div className="absolute place-self-center bottom-8 text-[10px] text-slate-700">
-          VERSION 0.0.1-ALPHA
-        </div>
       </AnimatePresence>
     </div>
   );

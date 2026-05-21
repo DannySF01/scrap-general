@@ -1,4 +1,3 @@
-// components/MechBay.tsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
@@ -105,8 +104,8 @@ export default function MechBay() {
       </div>
 
       {/* BLUEPRINT DISPLAY */}
-      <main className="flex-1 overflow-y-auto pr-2 z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <main className="flex-1 overflow-y-auto pr-2 z-10 custom-scrollbar">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <AnimatePresence mode="popLayout">
             {filteredItems.map((bp) => {
               const isProgressive = typeof bp.maxLevel === "number";

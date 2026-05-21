@@ -6,8 +6,10 @@ import type { Blueprint } from "../../types/game";
 export interface MetaSlice {
   upgrades: Record<string, number>;
   unlocks: Record<string, boolean>;
+  completedLevels: string[];
   purchaseUpgrade: (id: string, blueprintCosts: Blueprint["cost"]) => void;
   purchaseUnlock: (id: string) => void;
+  markLevelCompleted: (levelId: string) => void;
 }
 
 export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
@@ -16,6 +18,7 @@ export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
 ) => ({
   upgrades: {},
   unlocks: {},
+  completedLevels: [],
 
   purchaseUpgrade: (id, blueprintCosts) => {
     const { scrap, upgrades } = get();
@@ -53,4 +56,10 @@ export const createMetaSlice: StateCreator<GameState, [], [], MetaSlice> = (
       }));
     }
   },
+
+  markLevelCompleted: (levelId) =>
+    set((state) => {
+      if (state.completedLevels.includes(levelId)) return state;
+      return { completedLevels: [...state.completedLevels, levelId] };
+    }),
 });

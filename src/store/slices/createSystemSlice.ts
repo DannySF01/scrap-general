@@ -3,7 +3,7 @@ import type { GameState } from "../useGameStore";
 import type { GameStatus } from "../../types/game";
 import { resolveStat } from "../../utils/stats";
 
-export type MenuView = "MAIN" | "TECH_TREE" | "MECH_BAY" | "INTEL";
+export type MenuView = "MAIN" | "MISSION_SELECT" | "TECH_TREE" | "MECH_BAY";
 
 export interface SystemSlice {
   status: GameStatus;
@@ -16,6 +16,7 @@ export interface SystemSlice {
   baseHp: number;
   maxHp: number;
   currentView: MenuView;
+  currentLevelId: string;
 
   setView: (view: MenuView) => void;
   startGame: () => void;
@@ -41,6 +42,7 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
   hp: 100,
   baseHp: 100,
   maxHp: 100,
+  currentLevelId: "1-1",
 
   setView: (view) => set({ currentView: view }),
 
@@ -65,7 +67,8 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
 
   resetGame: () =>
     set({
-      currentLevelId: 1,
+      currentLevelId: "1-1",
+      completedLevels: [],
       wave: 0,
       baseHp: 100,
       robots: [],

@@ -7,12 +7,11 @@ import { LEVELS_MANIFEST } from "../../data/levels";
 export interface EnemySlice {
   enemies: Enemy[];
   lastSpawnTime: number;
-  currentLevelId: number;
   waveTimeLeft: number;
 
   spawnEnemies: () => void;
   tickEnemies: () => void;
-  selectLevel: (id: number) => void;
+  selectLevel: (id: string) => void;
 }
 
 export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
@@ -21,11 +20,14 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
 ) => ({
   enemies: [],
   lastSpawnTime: Date.now(),
-  currentLevelId: 1,
   waveTimeLeft: 30000,
 
   selectLevel: (id) =>
-    set({ currentLevelId: id, wave: 0, waveTimeLeft: 30000 }),
+    set({
+      currentLevelId: id,
+      wave: 0,
+      waveTimeLeft: 30000,
+    }),
 
   spawnEnemies: () => {
     const { enemies, currentLevelId, wave } = get();
@@ -82,6 +84,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
       enemies,
       waveTimeLeft,
       abilityActive,
+      markLevelCompleted,
     } = get();
 
     const levelData = LEVELS_MANIFEST[currentLevelId];
@@ -153,8 +156,16 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
           enemies: [],
         });
       } else {
-        const nextLevelId = currentLevelId + 1;
-        const hasMoreLevels = !!LEVELS_MANIFEST[nextLevelId];
+        const [chapter, level] = currentLevelId.split("-");
+        const nextLevelId = `${chapter}-${Number(level) + 1}`;
+
+        const goToNextChapter =
+          !!LEVELS_MANIFEST[`${Number(chapter) + 1}-1`] &&
+          !LEVELS_MANIFEST[nextLevelId];
+
+        const hasMoreLevels = !!LEVELS_MANIFEST[nextLevelId] || goToNextChapter;
+
+        markLevelCompleted(currentLevelId);
 
         set((state) => ({
           scrap: state.scrap + (levelData.rewards.scrap || 0),
@@ -162,7 +173,11 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
           core: (state.core || 0) + (levelData.rewards.core || 0),
 
           currentView: !hasMoreLevels ? "MAIN" : undefined,
-          currentLevelId: hasMoreLevels ? nextLevelId : state.currentLevelId,
+          currentLevelId: hasMoreLevels
+            ? goToNextChapter
+              ? `${Number(chapter) + 1}-1`
+              : nextLevelId
+            : state.currentLevelId,
           wave: 0,
           waveTimeLeft: 30000,
 
