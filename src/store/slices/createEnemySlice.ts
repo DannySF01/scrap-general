@@ -32,6 +32,11 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
   spawnEnemies: () => {
     const { enemies, currentLevelId, wave } = get();
 
+    const isBossType = (type: string) =>
+      type.includes("CRUSHER_PRIME") ||
+      type.includes("NEXUS_GHOST") ||
+      type.includes("APOCALYPSE");
+
     // LEVEL DATA
     const levelData = LEVELS_MANIFEST[currentLevelId];
     if (!levelData) return;
@@ -39,7 +44,15 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
     const currentWaveConfig = levelData.waves[wave];
     if (!currentWaveConfig) return;
 
-    const pool = currentWaveConfig.allowedTypes;
+    const pool = currentWaveConfig.allowedTypes.filter((type) => {
+      if (isBossType(type)) {
+        set({ waveTimeLeft: 0 });
+        const bossAlreadyOnField = enemies.some((e) => e.type === type);
+        return !bossAlreadyOnField;
+      }
+
+      return true;
+    });
     if (pool.length === 0) return;
 
     // SPAWN ENEMIES
@@ -70,7 +83,10 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
     const newEnemy: Enemy = {
       ...stats,
       id: crypto.randomUUID(),
-      position: { x: Math.random() * 80 + 10, y: -5 },
+      position: {
+        x: isBossType(selectedType) ? 50 : Math.random() * 80,
+        y: -5,
+      },
     };
 
     set({ enemies: [...enemies, newEnemy] });
@@ -104,7 +120,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         if (e.type === "OVERLORD") {
           if (!e.lastSpawn) e.lastSpawn = now;
 
-          if (now - e.lastSpawn > 5000) {
+          if (now - e.lastSpawn > 10000) {
             e.lastSpawn = now;
             const minionTemplate = REGISTRY.ENEMIES.MINION;
             spawnedFromOverlord = Array.from({ length: 5 }).map((_, i) => ({

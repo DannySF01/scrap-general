@@ -18,6 +18,11 @@ import {
 } from "lucide-react";
 import { Sniper } from "../assets/robots/Sniper";
 import { Rocket } from "../assets/robots/Rocket";
+import { ApexStalker } from "../assets/enemies/ApexStalker";
+import { OvershieldTitan } from "../assets/enemies/OvershieldTitan";
+import { NexusGhost } from "../assets/enemies/NexusGhost";
+import { Apocalypse } from "../assets/enemies/Apocalypse";
+import { CrusherPrime } from "../assets/enemies/CrusherPrime";
 
 export const REGISTRY: {
   ROBOTS: Record<Robot["type"], Robot>;
@@ -110,8 +115,36 @@ export const REGISTRY: {
       icon: Shielder,
       size: 40,
     },
+    APEX_STALKER: {
+      id: "APEX_STALKER",
+      type: "APEX_STALKER",
+      hp: 90,
+      maxHp: 90,
+      damage: 12,
+      speed: 0.25,
+      reward: 60,
+      position: { x: 0, y: 0 },
+      spawnChance: 5,
+      color: "cyan",
+      icon: ApexStalker,
+      size: 24,
+    },
+    OVERSHIELD_TITAN: {
+      id: "OVERSHIELD_TITAN",
+      type: "OVERSHIELD_TITAN",
+      hp: 450,
+      maxHp: 450,
+      damage: 30,
+      speed: 0.05,
+      reward: 150,
+      position: { x: 0, y: 0 },
+      spawnChance: 1,
+      color: "amber",
+      icon: OvershieldTitan,
+      size: 36,
+    },
     OVERLORD: {
-      id: "OVERLORD", // MINIBOSS : SPAWN 5 MINIONS EVERY 5 SECONDS
+      id: "OVERLORD", // MINIBOSS : SPAWN 5 MINIONS EVERY 10 SECONDS
       type: "OVERLORD",
       hp: 500,
       maxHp: 500,
@@ -123,6 +156,49 @@ export const REGISTRY: {
       color: "#f59e0b",
       icon: Overlord,
       size: 80,
+    },
+    CRUSHER_PRIME: {
+      id: "CRUSHER_PRIME",
+      type: "CRUSHER_PRIME",
+      hp: 800,
+      maxHp: 800,
+      damage: 999999, // INSTANT KILL
+      speed: 0.05,
+      reward: 350,
+      position: { x: 0, y: 0 },
+      spawnChance: 1,
+      color: "rose",
+      icon: CrusherPrime,
+      size: 120,
+    },
+    NEXUS_GHOST: {
+      id: "NEXUS_GHOST",
+      type: "NEXUS_GHOST",
+      hp: 1500,
+      maxHp: 1500,
+      damage: 999999, // INSTANT KILL
+      speed: 0.03,
+      reward: 750,
+      position: { x: 0, y: 0 },
+      spawnChance: 1,
+      color: "purple",
+      icon: NexusGhost,
+      size: 140,
+    },
+
+    APOCALYPSE: {
+      id: "APOCALYPSE",
+      type: "APOCALYPSE",
+      hp: 5000,
+      maxHp: 5000,
+      damage: 200,
+      speed: 0.02,
+      reward: 2500,
+      position: { x: 0, y: 0 },
+      spawnChance: 1,
+      color: "red",
+      icon: Apocalypse,
+      size: 200,
     },
   },
   ABILITIES: {

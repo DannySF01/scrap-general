@@ -8,7 +8,12 @@ export type EnemyType =
   | "ARMORED_MINION"
   | "REGENERATOR"
   | "SHIELDER"
-  | "OVERLORD";
+  | "APEX_STALKER"
+  | "OVERSHIELD_TITAN"
+  | "CRUSHER_PRIME"
+  | "OVERLORD"
+  | "NEXUS_GHOST"
+  | "APOCALYPSE";
 export type AbilityType = "EMP" | "REPAIR" | "OVERCLOCK" | "NAPALM";
 
 export interface Base {
