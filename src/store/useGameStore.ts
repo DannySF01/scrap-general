@@ -21,7 +21,7 @@ export type GameState = SystemSlice &
   AbilitySlice &
   EnemySlice &
   MetaSlice & {
-    tick: () => void;
+    tick: (dt: number) => void;
   };
 
 export const useGameStore = create<GameState>()(
@@ -33,7 +33,7 @@ export const useGameStore = create<GameState>()(
       ...createEnemySlice(set, get, api),
       ...createMetaSlice(set, get, api),
 
-      tick: () => {
+      tick: (dt: number) => {
         const {
           status,
           baseHp,
@@ -65,7 +65,6 @@ export const useGameStore = create<GameState>()(
         const spawnIntervalMs =
           currentWaveConfig?.spawnInterval || SPAWN_INTERVAL;
 
-        const dt = 60;
         const nextTimeLeft = Math.max(0, waveTimeLeft - dt);
         set({ waveTimeLeft: nextTimeLeft });
 
@@ -79,7 +78,7 @@ export const useGameStore = create<GameState>()(
         // TICK SYSTEM UPDATES
         tickCooldowns(dt);
         tickEnemies();
-        processCombat();
+        processCombat(dt);
       },
     }),
     {

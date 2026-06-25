@@ -12,7 +12,7 @@ export interface CombatSlice {
   lastShotTime: number;
   selectedTurretType: Turret["type"];
   selectTurret: (type: Turret["type"]) => void;
-  processCombat: () => void;
+  processCombat: (dt: number) => void;
   vfxEvents: {
     id: number;
     type: string;
@@ -47,7 +47,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
 
   setFiring: (isFiring: boolean) => set({ isFiring }),
 
-  processCombat: () => {
+  processCombat: (dt: number) => {
     const {
       playerPos,
       isFiring,
@@ -68,12 +68,12 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     const weaponTemplate = REGISTRY.TURRETS[selectedTurretType];
     if (!weaponTemplate) return;
 
-    // Execução do disparo
+    // Firing logic
     if (isFiring) {
       let fireRate = resolveStat("fireRate", weaponTemplate.fireRate, upgrades);
       if (abilityActive.find((a) => a === "OVERCLOCK")) fireRate /= 2;
 
-      if (now - lastShotTime >= fireRate && currentEnemies.length > 0) {
+      if (now - lastShotTime >= fireRate) {
         const baseDamage = resolveStat(
           "damage",
           weaponTemplate.damage,
@@ -94,7 +94,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         activeBullets.push({
           id: crypto.randomUUID(),
           x: playerPos.x,
-          y: playerPos.y, // Bala aparece 3px acima do jogador
+          y: playerPos.y, // Bullet leaves from the turret
           dirX: 0,
           dirY: -1,
           damage: finalDamage,
@@ -105,19 +105,22 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       }
     }
 
-    // ================= 2. MOVIMENTO EM LINHA RETA E DETEÇÃO DE IMPACTO MULTI-ALVO =================
+    // Bullet movement
     const updatedBullets: Bullet[] = [];
+
+    // Converts to millisecond
+    const timeStepMultiplier = dt / 16.666; // 60fps
 
     for (const bullet of activeBullets) {
       const nextX = bullet.x;
-      const nextY = bullet.y + bullet.dirY * bullet.speed;
+      const nextY = bullet.y + bullet.dirY * bullet.speed * timeStepMultiplier;
 
-      // Se a bala sair dos limites da Arena, é destruída
+      // Destroy bullet if it goes out of bounds
       if (nextY < -2) {
         continue;
       }
 
-      // Procura QUALQUER inimigo que esteja perto das coordenadas atuais da bala (Deteção de colisão por proximidade)
+      // Check for collision with enemies
       let hitEnemy = null;
       for (const enemy of currentEnemies) {
         if (enemy.hp <= 0) continue;
@@ -125,15 +128,15 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         const edy = enemy.position.y - nextY;
         const distance = Math.sqrt(edx * edx + edy * edy);
 
-        // Raio de colisão do corpo do monstro
+        // Bullet hit an enemy
         if (distance < 3) {
           hitEnemy = enemy;
-          break; // Para o loop, a bala bateu no primeiro que encontrou
+          break;
         }
       }
 
       if (hitEnemy) {
-        // Regra do Shielder
+        // Shielder Blocks Single/Splash calculations
         if (hitEnemy.type === "SHIELDER" && Math.random() < 0.2) {
           newVfx.push({
             id: Math.random(),
@@ -143,7 +146,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           continue;
         }
 
-        // Aplicação de Dano (Splash vs Alvo Único)
+        // Apply damage to the hit enemy
         if (weaponTemplate.splashRadius) {
           newVfx.push({
             id: Math.random(),
@@ -177,10 +180,10 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           });
         }
 
-        continue; // A bala explode e morre aqui
+        continue; // Destroy bullet if it hits an enemy
       }
 
-      // Se não bateu em nada, a bala continua viva para o próximo tick
+      // Preserve bullet if it doesn't hit an enemy
       updatedBullets.push({
         ...bullet,
         x: nextX,
@@ -188,7 +191,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       });
     }
 
-    // ================= 3. LIMPEZA DE MORTES =================
+    // Remove dead enemies
     const survivingEnemies = currentEnemies.filter((e) => {
       if (e.hp <= 0) {
         totalScrapGained += e.reward;

@@ -31,7 +31,6 @@ export const BulletCanvas: React.FC = () => {
       const { bullets, selectedTurretType } = useGameStore.getState();
 
       bullets.forEach((bullet) => {
-        // Convert bullet position to canvas pixels
         const pixelX = (bullet.x / 100) * canvas.width;
         const pixelY = (bullet.y / 100) * canvas.height;
 
