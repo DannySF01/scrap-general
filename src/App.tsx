@@ -3,7 +3,6 @@ import { useGameStore } from "./store/useGameStore";
 import { useGameLoop } from "./hooks/useGameLoop";
 import { GameOverlay } from "./components/GameOverlay";
 import { useEffect } from "react";
-import { DeploymentHub } from "./components/DeploymentHub";
 import { MainMenu } from "./components/MainMenu";
 import { VfxManager } from "./components/VfxManager";
 
@@ -36,7 +35,6 @@ export default function App() {
         <VfxManager />
         <MainMenu />
         <GameOverlay />
-        <DeploymentHub />
         <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_150px_rgba(0,0,0,0.5)] z-10" />
       </main>
     </div>

@@ -90,7 +90,7 @@ export default function MechBay() {
           icon={<Cpu size={12} />}
         />
         <TerminalTab
-          label="Base Expansion"
+          label="Expansions"
           active={activeTab === "EXPANSIONS"}
           onClick={() => setActiveTab("EXPANSIONS")}
           icon={<LayoutGrid size={12} />}

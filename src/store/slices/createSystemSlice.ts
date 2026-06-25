@@ -58,8 +58,7 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
     set({
       status: "IDLE",
       currentView: "MAIN",
-      bases: get().bases.map((b) => ({ ...b, occupantId: null })),
-      robots: [],
+      turrets: [],
       enemies: [],
       wave: 0,
       waveTimeLeft: 30000,
@@ -71,8 +70,14 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       completedLevels: [],
       wave: 0,
       baseHp: 100,
-      robots: [],
+      turrets: [],
       enemies: [],
+      scrap: 0,
+      alloy: 0,
+      core: 0,
+      luck: 0,
+      hp: 100,
+      maxHp: 100,
     }),
 
   addScrap: (amount) =>

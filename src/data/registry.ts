@@ -2,9 +2,8 @@ import { ArmoredMinion } from "../assets/enemies/ArmoredMinion";
 import { Minion } from "../assets/enemies/Minion";
 import { Overlord } from "../assets/enemies/Overlord";
 import { Regenerator } from "../assets/enemies/Regenerator";
-import { Sentry } from "../assets/robots/Sentry";
 import { Shielder } from "../assets/enemies/Shielder";
-import type { Ability, Blueprint, Enemy, Robot, Upgrade } from "../types/game";
+import type { Ability, Blueprint, Enemy, Turret, Upgrade } from "../types/game";
 import {
   Crosshair,
   Flame,
@@ -16,8 +15,6 @@ import {
   Wrench,
   Zap,
 } from "lucide-react";
-import { Sniper } from "../assets/robots/Sniper";
-import { Rocket } from "../assets/robots/Rocket";
 import { ApexStalker } from "../assets/enemies/ApexStalker";
 import { OvershieldTitan } from "../assets/enemies/OvershieldTitan";
 import { NexusGhost } from "../assets/enemies/NexusGhost";
@@ -25,28 +22,24 @@ import { Apocalypse } from "../assets/enemies/Apocalypse";
 import { CrusherPrime } from "../assets/enemies/CrusherPrime";
 
 export const REGISTRY: {
-  ROBOTS: Record<Robot["type"], Robot>;
+  TURRETS: Record<Turret["type"], Turret>;
   ENEMIES: Record<Enemy["type"], Enemy>;
   ABILITIES: Record<string, Ability>;
   UPGRADES: Record<string, Upgrade>;
   BLUEPRINTS: Record<string, Blueprint>;
 } = {
-  ROBOTS: {
+  TURRETS: {
     SENTRY: {
       id: "SENTRY",
       type: "SENTRY",
       damage: 5,
       fireRate: 800,
-      color: "indigo",
-      icon: Sentry,
     },
     SNIPER: {
       id: "SNIPER",
       type: "SNIPER",
       damage: 25,
       fireRate: 2500,
-      color: "emerald",
-      icon: Sniper,
     },
     ROCKET: {
       id: "ROCKET",
@@ -54,8 +47,6 @@ export const REGISTRY: {
       damage: 50,
       fireRate: 3000,
       splashRadius: 15,
-      color: "rose",
-      icon: Rocket,
     },
   },
   ENEMIES: {
@@ -621,52 +612,6 @@ export const REGISTRY: {
         "Unlocks assembly authorization for long-range rocket launcher units.",
       source: "MATERIAL_DROP",
       cost: { scrap: 7000, alloy: 30 },
-    },
-    // BASE EXPANSIONS
-    SLOT_ALPHA_02: {
-      id: "SLOT_ALPHA_02",
-      tab: "EXPANSIONS",
-      title: "Flank Lock // Alpha-02",
-      description:
-        "Unlocks the physical defensive structural slot on the West flank.",
-      source: "SCRAP",
-      cost: { scrap: 5000 },
-    },
-    SLOT_CENTER_03: {
-      id: "SLOT_CENTER_03",
-      tab: "EXPANSIONS",
-      title: "Center Lock // Center-03",
-      description:
-        "Unlocks the physical defensive structural slot on the West flank.",
-      source: "SCRAP",
-      cost: { scrap: 10000 },
-    },
-    SLOT_BRAVO_04: {
-      id: "SLOT_BRAVO_04",
-      tab: "EXPANSIONS",
-      title: "Flank Lock // BRAVO-04",
-      description:
-        "Unlocks the physical defensive structural slot on the East flank.",
-      source: "SCRAP",
-      cost: { scrap: 15000 },
-    },
-    SLOT_REAR_05: {
-      id: "SLOT_REAR_05",
-      tab: "EXPANSIONS",
-      title: "Rear Lock // Rear-05",
-      description:
-        "Unlocks the physical defensive structural slot on the East flank.",
-      source: "SCRAP",
-      cost: { scrap: 20000 },
-    },
-    SLOT_OMEGA_06: {
-      id: "SLOT_OMEGA_06",
-      tab: "EXPANSIONS",
-      title: "Rear Lock // OMEGA-06",
-      description:
-        "Unlocks the physical defensive structural slot on the East flank.",
-      source: "SCRAP",
-      cost: { scrap: 25000 },
     },
     // ABILITIES
     ABILITY_EMP: {

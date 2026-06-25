@@ -1,4 +1,3 @@
-// hooks/useDragScroll.ts
 import { useRef, useState } from "react";
 
 export function useDragScroll() {

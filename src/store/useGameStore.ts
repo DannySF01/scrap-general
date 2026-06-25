@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { Base } from "../types/game";
 import { persist, createJSONStorage } from "zustand/middleware";
 import {
   createCombatSlice,
@@ -22,7 +21,6 @@ export type GameState = SystemSlice &
   AbilitySlice &
   EnemySlice &
   MetaSlice & {
-    bases: Base[];
     tick: () => void;
   };
 
@@ -34,51 +32,6 @@ export const useGameStore = create<GameState>()(
       ...createAbilitySlice(set, get, api),
       ...createEnemySlice(set, get, api),
       ...createMetaSlice(set, get, api),
-
-      bases: [
-        {
-          id: 1,
-          name: "VANGUARD_01",
-          x: 10,
-          y: 93,
-          occupantId: null,
-        },
-        {
-          id: 2,
-          name: "ALPHA_02",
-          x: 20,
-          y: 93,
-          occupantId: null,
-        },
-        {
-          id: 3,
-          name: "CENTER_03",
-          x: 30,
-          y: 93,
-          occupantId: null,
-        },
-        {
-          id: 4,
-          name: "BRAVO_04",
-          x: 70,
-          y: 93,
-          occupantId: null,
-        },
-        {
-          id: 5,
-          name: "REAR_05",
-          x: 80,
-          y: 93,
-          occupantId: null,
-        },
-        {
-          id: 6,
-          name: "OMEGA_06",
-          x: 90,
-          y: 93,
-          occupantId: null,
-        },
-      ],
 
       tick: () => {
         const {

@@ -1,14 +1,17 @@
 import type { StateCreator } from "zustand";
-import type { Base, Robot } from "../../types/game";
+import type { Bullet, Turret } from "../../types/game";
 import type { GameState } from "../useGameStore";
 import { REGISTRY } from "../../data/registry";
 import { resolveStat } from "../../utils/stats";
 
 export interface CombatSlice {
-  robots: Robot[];
-  selectedRobotType: Robot["type"];
-  selectRobot: (type: Robot["type"]) => void;
-  deployToBase: (baseId: number, type: Robot["type"]) => void;
+  turrets: Turret[];
+  playerPos: { x: number; y: number };
+  isFiring: boolean;
+  bullets: Bullet[];
+  lastShotTime: number;
+  selectedTurretType: Turret["type"];
+  selectTurret: (type: Turret["type"]) => void;
   processCombat: () => void;
   vfxEvents: {
     id: number;
@@ -17,132 +20,175 @@ export interface CombatSlice {
     radius?: number;
   }[];
   removeVfx: (id: number) => void;
+  updatePlayerPos: (x: number, y: number) => void;
+  updateTurretType: (type: Turret["type"]) => void;
+  setFiring: (isFiring: boolean) => void;
 }
 
 export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
   set,
   get,
 ) => ({
-  robots: [],
-  selectedRobotType: "SENTRY",
+  turrets: [],
+  playerPos: { x: 50, y: 80 },
+  isFiring: false,
+  bullets: [],
+  lastShotTime: 0,
+  selectedTurretType: "SENTRY",
   vfxEvents: [],
   removeVfx: (id: number) =>
     set({ vfxEvents: get().vfxEvents.filter((e) => e.id !== id) }),
 
-  selectRobot: (type: Robot["type"]) => set({ selectedRobotType: type }),
+  selectTurret: (type: Turret["type"]) => set({ selectedTurretType: type }),
 
-  deployToBase: (baseId: number, type: Robot["type"]) => {
-    const { bases, robots } = get();
+  updatePlayerPos: (x: number, y: number) => set({ playerPos: { x, y } }),
 
-    const targetBase = bases.find((b: Base) => b.id === baseId);
-    if (!targetBase) return;
+  updateTurretType: (type: Turret["type"]) => set({ selectedTurretType: type }),
 
-    const isUnlocked = baseId === 1 || get().unlocks[`SLOT_${targetBase.name}`];
-    if (!isUnlocked) return;
-
-    let updatedRobots = [...robots];
-    if (targetBase.occupantId) {
-      updatedRobots = updatedRobots.filter(
-        (r) => r.id !== targetBase.occupantId,
-      );
-    }
-
-    const template = REGISTRY.ROBOTS[type];
-
-    const newRobot: Robot = {
-      ...template,
-      id: crypto.randomUUID(),
-      level: 1,
-      position: { x: targetBase.x, y: targetBase.y },
-      type,
-      lastShot: Date.now(),
-      lastTargetPos: null,
-    };
-
-    set({
-      robots: [...updatedRobots, newRobot],
-      bases: bases.map((b) =>
-        b.id === baseId ? { ...b, occupantId: newRobot.id } : b,
-      ),
-    });
-  },
+  setFiring: (isFiring: boolean) => set({ isFiring }),
 
   processCombat: () => {
-    const { robots, enemies, upgrades, abilityActive } = get();
+    const {
+      playerPos,
+      isFiring,
+      lastShotTime,
+      selectedTurretType,
+      enemies,
+      upgrades,
+      bullets,
+      abilityActive,
+    } = get();
     const now = Date.now();
 
     let currentEnemies = [...enemies];
+    let activeBullets = [...bullets];
     let totalScrapGained = 0;
     let newVfx: CombatSlice["vfxEvents"] = [];
 
-    const updatedRobots = robots.map((robot) => {
-      let fireRate = resolveStat("fireRate", robot.fireRate, upgrades);
+    const weaponTemplate = REGISTRY.TURRETS[selectedTurretType];
+    if (!weaponTemplate) return;
 
+    // Execução do disparo
+    if (isFiring) {
+      let fireRate = resolveStat("fireRate", weaponTemplate.fireRate, upgrades);
       if (abilityActive.find((a) => a === "OVERCLOCK")) fireRate /= 2;
-      else fireRate *= 2;
 
-      // Cooldown check
-      if (robot.lastShot && now - robot.lastShot < fireRate) return robot;
-
-      // 3. Find Target (Highest Y first)
-      const target = [...currentEnemies]
-        .sort((a, b) => b.position.y - a.position.y)
-        .find((e) => e.hp > 0 && e.position.y > 12);
-
-      if (!target) return robot;
-
-      // 4. Calculate Damage
-      const baseDamage = resolveStat("damage", robot.damage, upgrades);
-      const sentryBonus =
-        robot.type === "SENTRY" ? resolveStat("sentryDamage", 0, upgrades) : 0;
-      const critChance = resolveStat("critChance", 0, upgrades);
-      const isCrit = Math.random() < critChance;
-      const damageToApply = isCrit
-        ? (baseDamage + sentryBonus) * 2
-        : baseDamage + sentryBonus;
-
-      // 5. Handle Block Chance
-      if (target.type === "SHIELDER" && Math.random() < 0.2) {
-        newVfx.push({
-          id: Math.random(),
-          type: "BLOCKED",
-          pos: target.position,
-        });
-        return {
-          ...robot,
-          lastShot: now,
-          lastTargetPos: { ...target.position },
-        };
-      }
-
-      // 6. Apply Damage (Splash / Single)
-      if (robot.splashRadius) {
-        newVfx.push({
-          id: Math.random(),
-          type: "EXPLOSION",
-          pos: target.position,
-          radius: robot.splashRadius,
-        });
-        currentEnemies = currentEnemies.map((e) => {
-          const dx = e.position.x - target.position.x;
-          const dy = e.position.y - target.position.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          const radius = robot.splashRadius ?? 0;
-          return dist <= radius ? { ...e, hp: e.hp - damageToApply } : e;
-        });
-      } else {
-        currentEnemies = currentEnemies.map((e) =>
-          e.id === target.id ? { ...e, hp: e.hp - damageToApply } : e,
+      if (now - lastShotTime >= fireRate && currentEnemies.length > 0) {
+        const baseDamage = resolveStat(
+          "damage",
+          weaponTemplate.damage,
+          upgrades,
         );
+        const sentryBonus =
+          selectedTurretType === "SENTRY"
+            ? resolveStat("sentryDamage", 0, upgrades)
+            : 0;
+        const critChance = resolveStat("critChance", 0, upgrades);
+
+        const isCrit = Math.random() < critChance;
+        const finalDamage = isCrit
+          ? (baseDamage + sentryBonus) * 2
+          : baseDamage + sentryBonus;
+        const bulletSpeed = (weaponTemplate as any).bulletSpeed ?? 6.0;
+
+        activeBullets.push({
+          id: crypto.randomUUID(),
+          x: playerPos.x,
+          y: playerPos.y, // Bala aparece 3px acima do jogador
+          dirX: 0,
+          dirY: -1,
+          damage: finalDamage,
+          speed: bulletSpeed,
+        });
+
+        set({ lastShotTime: now });
+      }
+    }
+
+    // ================= 2. MOVIMENTO EM LINHA RETA E DETEÇÃO DE IMPACTO MULTI-ALVO =================
+    const updatedBullets: Bullet[] = [];
+
+    for (const bullet of activeBullets) {
+      const nextX = bullet.x;
+      const nextY = bullet.y + bullet.dirY * bullet.speed;
+
+      // Se a bala sair dos limites da Arena, é destruída
+      if (nextY < -2) {
+        continue;
       }
 
-      if (isCrit)
-        newVfx.push({ id: Math.random(), type: "CRIT", pos: target.position });
+      // Procura QUALQUER inimigo que esteja perto das coordenadas atuais da bala (Deteção de colisão por proximidade)
+      let hitEnemy = null;
+      for (const enemy of currentEnemies) {
+        if (enemy.hp <= 0) continue;
+        const edx = enemy.position.x - nextX;
+        const edy = enemy.position.y - nextY;
+        const distance = Math.sqrt(edx * edx + edy * edy);
 
-      return { ...robot, lastShot: now, lastTargetPos: { ...target.position } };
-    });
+        // Raio de colisão do corpo do monstro
+        if (distance < 3) {
+          hitEnemy = enemy;
+          break; // Para o loop, a bala bateu no primeiro que encontrou
+        }
+      }
 
+      if (hitEnemy) {
+        // Regra do Shielder
+        if (hitEnemy.type === "SHIELDER" && Math.random() < 0.2) {
+          newVfx.push({
+            id: Math.random(),
+            type: "BLOCKED",
+            pos: hitEnemy.position,
+          });
+          continue;
+        }
+
+        // Aplicação de Dano (Splash vs Alvo Único)
+        if (weaponTemplate.splashRadius) {
+          newVfx.push({
+            id: Math.random(),
+            type: "EXPLOSION",
+            pos: hitEnemy.position,
+            radius: weaponTemplate.splashRadius,
+          });
+
+          currentEnemies = currentEnemies.map((e) => {
+            const sdx = e.position.x - hitEnemy!.position.x;
+            const sdy = e.position.y - hitEnemy!.position.y;
+            const sdist = Math.sqrt(sdx * sdx + sdy * sdy);
+            return sdist <= (weaponTemplate.splashRadius ?? 0)
+              ? { ...e, hp: e.hp - bullet.damage }
+              : e;
+          });
+        } else {
+          currentEnemies = currentEnemies.map((e) =>
+            e.id === hitEnemy!.id ? { ...e, hp: e.hp - bullet.damage } : e,
+          );
+        }
+
+        const isCritDamage =
+          bullet.damage >
+          resolveStat("damage", weaponTemplate.damage, upgrades) * 1.5;
+        if (isCritDamage) {
+          newVfx.push({
+            id: Math.random(),
+            type: "CRIT",
+            pos: hitEnemy.position,
+          });
+        }
+
+        continue; // A bala explode e morre aqui
+      }
+
+      // Se não bateu em nada, a bala continua viva para o próximo tick
+      updatedBullets.push({
+        ...bullet,
+        x: nextX,
+        y: nextY,
+      });
+    }
+
+    // ================= 3. LIMPEZA DE MORTES =================
     const survivingEnemies = currentEnemies.filter((e) => {
       if (e.hp <= 0) {
         totalScrapGained += e.reward;
@@ -152,8 +198,8 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     });
 
     set((state) => ({
-      robots: updatedRobots,
       enemies: survivingEnemies,
+      bullets: updatedBullets,
       scrap: state.scrap + totalScrapGained,
       vfxEvents: [...state.vfxEvents, ...newVfx],
     }));

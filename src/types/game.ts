@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type GameStatus = "IDLE" | "PLAYING" | "PAUSED" | "GAME_OVER";
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
-export type RobotType = "SENTRY" | "SNIPER" | "ROCKET";
+export type TurretType = "SENTRY" | "SNIPER" | "ROCKET";
 export type EnemyType =
   | "MINION"
   | "ARMORED_MINION"
@@ -15,14 +15,6 @@ export type EnemyType =
   | "NEXUS_GHOST"
   | "APOCALYPSE";
 export type AbilityType = "EMP" | "REPAIR" | "OVERCLOCK" | "NAPALM";
-
-export interface Base {
-  id: number;
-  name: string;
-  x: number;
-  y: number;
-  occupantId: string | null;
-}
 
 export interface Blueprint {
   id: string;
@@ -62,18 +54,25 @@ export interface Upgrade {
   modifiers?: Record<string, number>;
 }
 
-export interface Robot {
+export interface Turret {
   id: string;
-  type: RobotType;
-  position?: { x: number; y: number };
+  type: TurretType;
   level?: number;
   damage: number;
   fireRate: number;
   lastShot?: number;
   splashRadius?: number;
   lastTargetPos?: { x: number; y: number } | null;
-  color: string;
-  icon: LucideIcon | React.ComponentType<any>;
+}
+
+export interface Bullet {
+  id: string;
+  x: number;
+  y: number;
+  dirX: number;
+  dirY: number;
+  damage: number;
+  speed: number;
 }
 
 export interface Enemy {
