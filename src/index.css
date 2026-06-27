@@ -27,7 +27,7 @@
   background: rgba(255, 69, 0, 0.2);
   animation: flicker 0.1s infinite;
   pointer-events: none;
-  height: 85%;
+  height: 68%;
 }
 
 @keyframes flicker {

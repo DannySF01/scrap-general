@@ -10,7 +10,7 @@ export interface EnemySlice {
   waveTimeLeft: number;
 
   spawnEnemies: () => void;
-  tickEnemies: () => void;
+  tickEnemies: (dt: number) => void;
   selectLevel: (id: string) => void;
 }
 
@@ -84,7 +84,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
       ...stats,
       id: crypto.randomUUID(),
       position: {
-        x: isBossType(selectedType) ? 50 : Math.random() * 80,
+        x: isBossType(selectedType) ? 50 : Math.random() * 80 + 10,
         y: -5,
       },
     };
@@ -92,7 +92,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
     set({ enemies: [...enemies, newEnemy] });
   },
 
-  tickEnemies: () => {
+  tickEnemies: (dt: number) => {
     const {
       takeDamage,
       currentLevelId,
@@ -110,12 +110,14 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
     const isNapalmActive = abilityActive.find((a) => a === "NAPALM");
 
     const now = Date.now();
-
     let spawnedFromOverlord: Enemy[] = [];
+
+    const timeStepMultiplier = dt / 16.666;
 
     set((state) => {
       const updatedEnemies = state.enemies.map((e) => {
         let nextHp = e.hp;
+        let currentY = e.position.y;
 
         if (e.type === "OVERLORD") {
           if (!e.lastSpawn) e.lastSpawn = now;
@@ -128,31 +130,42 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
               id: `enemy-${now}-${i}`,
               position: {
                 x: e.position.x - 10 + i * 5,
-                y: e.position.y,
+                y: currentY,
               },
             }));
           }
         }
 
-        if (isNapalmActive) nextHp -= 1;
+        // Napalm damage enemies each tick
+        if (isNapalmActive) nextHp -= 1 * timeStepMultiplier;
 
+        // REGENERATOR regenerates hp each tick
         if (e.type === "REGENERATOR" && nextHp > 0 && nextHp < e.maxHp) {
-          nextHp = Math.min(e.maxHp, nextHp + e.maxHp * 0.01);
+          nextHp = Math.min(
+            e.maxHp,
+            nextHp + e.maxHp * 0.01 * timeStepMultiplier,
+          );
+        }
+
+        // Moves enemies until they hit the base
+        if (currentY < 68) {
+          currentY = Math.min(68, currentY + e.speed * timeStepMultiplier);
         }
 
         return {
           ...e,
           hp: nextHp,
-          position: { ...e.position, y: e.position.y + e.speed },
+          position: { ...e.position, y: currentY },
         };
       });
 
       return {
         enemies: [...updatedEnemies, ...spawnedFromOverlord].filter((e) => {
-          if (e.hp <= 0) return false;
-          if (e.position.y >= 83) {
-            takeDamage(e.damage);
-            return false;
+          if (e.position.y >= 68) {
+            // Scales base damage value down to smooth frame-time fractions
+            const wallDamage = e.damage * 0.01 * timeStepMultiplier;
+            takeDamage(wallDamage);
+            return true;
           }
           return true;
         }),

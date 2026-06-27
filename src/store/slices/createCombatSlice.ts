@@ -86,9 +86,11 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         const critChance = resolveStat("critChance", 0, upgrades);
 
         const isCrit = Math.random() < critChance;
+
         const finalDamage = isCrit
           ? (baseDamage + sentryBonus) * 2
           : baseDamage + sentryBonus;
+
         const bulletSpeed = (weaponTemplate as any).bulletSpeed ?? 6.0;
 
         activeBullets.push({
@@ -99,6 +101,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           dirY: -1,
           damage: finalDamage,
           speed: bulletSpeed,
+          isCrit,
         });
 
         set({ lastShotTime: now });
@@ -169,16 +172,12 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           );
         }
 
-        const isCritDamage =
-          bullet.damage >
-          resolveStat("damage", weaponTemplate.damage, upgrades) * 1.5;
-        if (isCritDamage) {
+        if (bullet.isCrit)
           newVfx.push({
             id: Math.random(),
             type: "CRIT",
             pos: hitEnemy.position,
           });
-        }
 
         continue; // Destroy bullet if it hits an enemy
       }
@@ -194,8 +193,15 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     // Remove dead enemies
     const survivingEnemies = currentEnemies.filter((e) => {
       if (e.hp <= 0) {
-        totalScrapGained += e.reward;
-        return false;
+        // Register enemy death time
+        if (!e.destroyedAt) {
+          e.destroyedAt = Date.now();
+          totalScrapGained += e.reward;
+        }
+
+        // Keep enemy dead for 500ms
+        const timeSinceDeath = Date.now() - e.destroyedAt;
+        return timeSinceDeath < 500;
       }
       return true;
     });

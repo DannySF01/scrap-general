@@ -73,6 +73,7 @@ export interface Bullet {
   dirY: number;
   damage: number;
   speed: number;
+  isCrit: boolean;
 }
 
 export interface Enemy {
@@ -89,6 +90,7 @@ export interface Enemy {
   icon: LucideIcon | React.ComponentType<any>;
   size: number;
   lastSpawn?: number;
+  destroyedAt?: number;
 }
 
 export interface ScrapDrop {

@@ -8,7 +8,7 @@ export function BaseWall() {
   const wallColor = healthPercent > 50 ? "border-indigo-500" : "border-red-500";
 
   return (
-    <div className="absolute bottom-[15%] left-0 w-full flex flex-col items-center gap-2 pointer-events-none">
+    <div className="absolute bottom-[30%] left-0 w-full flex flex-col items-center gap-2 pointer-events-none">
       <motion.div
         animate={healthPercent < 30 ? { x: [-1, 1, -1] } : {}}
         transition={{ repeat: Infinity, duration: 0.1 }}

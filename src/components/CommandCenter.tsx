@@ -53,7 +53,7 @@ export default function CommandCenter() {
                   <div className="flex flex-col gap-0.5 text-[9px] font-mono font-black text-slate-400 tracking-tighter">
                     <div className="flex justify-between">
                       <span>MAX INTEGRITY:</span>
-                      <span className="text-white">{baseHp} HP</span>
+                      <span className="text-white">{Math.ceil(hp)} HP</span>
                     </div>
                   </div>
                   {/* Tooltip Triangle Arrow */}
@@ -67,13 +67,15 @@ export default function CommandCenter() {
               <span className="uppercase text-rose-500 group-hover:text-rose-400 transition-colors">
                 Base Integrity
               </span>
-              <span className="text-white">{hp} HP</span>
+              <span className="text-white">{Math.ceil(hp)} HP</span>
             </div>
 
             <div className="w-full h-2 bg-slate-900 border border-slate-800 rounded-xs overflow-hidden">
               <div
                 className="h-full bg-linear-to-r from-rose-600 to-red-500 transition-all duration-300 shadow-[0_0_8px_rgba(239,68,68,0.4)]"
-                style={{ width: `${Math.max(0, Math.min(baseHp, hp))}%` }}
+                style={{
+                  width: `${Math.max(0, Math.min(baseHp, Math.ceil(hp)))}%`,
+                }}
               />
             </div>
           </div>

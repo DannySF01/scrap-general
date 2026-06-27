@@ -33,7 +33,7 @@ export function Arena() {
 
       // Limits player position within arena
       mousePos.current.x = Math.max(3, Math.min(97, xPercent));
-      mousePos.current.y = Math.max(50, Math.min(80, yPercent));
+      mousePos.current.y = Math.max(73, Math.min(83, yPercent));
     };
 
     const handleMouseDown = (e: MouseEvent) => {

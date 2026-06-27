@@ -77,7 +77,7 @@ export const useGameStore = create<GameState>()(
 
         // TICK SYSTEM UPDATES
         tickCooldowns(dt);
-        tickEnemies();
+        tickEnemies(dt);
         processCombat(dt);
       },
     }),
