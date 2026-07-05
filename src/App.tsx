@@ -7,11 +7,10 @@ import { MainMenu } from "./components/MainMenu";
 import { VfxManager } from "./components/VfxManager";
 
 export default function App() {
-  const { status, togglePause, syncStats } = useGameStore();
+  const { status, togglePause } = useGameStore();
   useGameLoop();
 
   useEffect(() => {
-    syncStats();
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space") e.preventDefault();
 
@@ -35,7 +34,6 @@ export default function App() {
         <VfxManager />
         <MainMenu />
         <GameOverlay />
-        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_150px_rgba(0,0,0,0.5)] z-10" />
       </main>
     </div>
   );

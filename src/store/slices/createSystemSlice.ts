@@ -21,8 +21,9 @@ export interface SystemSlice {
   setView: (view: MenuView) => void;
   startGame: () => void;
   togglePause: () => void;
-  quitGame: () => void;
+  restartGame: () => void;
   resetGame: () => void;
+  quitGame: () => void;
   addScrap: (amount: number) => void;
   takeDamage: (amount: number) => void;
   syncStats: () => void;
@@ -46,12 +47,26 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
 
   setView: (view) => set({ currentView: view }),
 
-  startGame: () => set({ status: "PLAYING" }),
+  startGame: () => {
+    set({ status: "PLAYING" });
+    get().syncStats();
+  },
 
   togglePause: () => {
     const { status } = get();
     if (status === "PLAYING") set({ status: "PAUSED" });
     else if (status === "PAUSED") set({ status: "PLAYING" });
+  },
+
+  restartGame: () => {
+    set({
+      status: "PLAYING",
+      wave: 0,
+      waveTimeLeft: 30000,
+      turrets: [],
+      enemies: [],
+    });
+    get().syncStats();
   },
 
   quitGame: () =>
@@ -69,7 +84,6 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       currentLevelId: "1-1",
       completedLevels: [],
       wave: 0,
-      baseHp: 100,
       turrets: [],
       enemies: [],
       scrap: 0,
@@ -77,6 +91,7 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       core: 0,
       luck: 0,
       hp: 100,
+      baseHp: 100,
       maxHp: 100,
     }),
 

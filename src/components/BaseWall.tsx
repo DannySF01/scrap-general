@@ -1,19 +1,34 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
 
-export function BaseWall() {
-  const { hp, maxHp } = useGameStore();
+import desertWallImg from "../assets/Fields/Desert/desert_wall.png";
 
-  const healthPercent = Math.ceil((hp / maxHp) * 100);
-  const wallColor = healthPercent > 50 ? "border-indigo-500" : "border-red-500";
+export function BaseWall() {
+  const { baseHp, hp } = useGameStore();
+
+  const healthPercent = Math.max(0, Math.min(baseHp, Math.ceil(hp)));
+  const isCritical = healthPercent <= 10;
 
   return (
-    <div className="absolute bottom-[30%] left-0 w-full flex flex-col items-center gap-2 pointer-events-none">
+    <div className="absolute top-[70%] left-0 w-full flex flex-col items-center pointer-events-none z-10 select-none -translate-y-1/2">
       <motion.div
-        animate={healthPercent < 30 ? { x: [-1, 1, -1] } : {}}
-        transition={{ repeat: Infinity, duration: 0.1 }}
-        className={`w-full h-4 border-t-4 bg-slate-900/80 backdrop-blur-sm ${wallColor} shadow-[0_-10px_20px_rgba(0,0,0,0.5)]`}
-      />
+        animate={
+          isCritical ? { x: [-1.1, 1.1, -1.1], y: [0.1, -0.1, 0.1] } : {}
+        }
+        transition={{ repeat: Infinity, duration: 0.08, ease: "linear" }}
+        className="w-full relative flex flex-col items-center"
+      >
+        <div
+          className="w-full h-50 relative"
+          style={{
+            backgroundImage: `url(${desertWallImg})`,
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "repeat-x",
+            filter: "brightness(0.55) contrast(1.2) saturate(0.85)",
+          }}
+        />
+      </motion.div>
     </div>
   );
 }

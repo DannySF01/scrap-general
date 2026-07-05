@@ -43,7 +43,17 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
 
   updatePlayerPos: (x: number, y: number) => set({ playerPos: { x, y } }),
 
-  updateTurretType: (type: Turret["type"]) => set({ selectedTurretType: type }),
+  updateTurretType: (type: Turret["type"]) => {
+    const { unlocks } = get();
+
+    // Check if turret is unlocked
+    const blueprintKey = `${type}_BLUEPRINT`;
+    const isTurretUnlocked = type === "SENTRY" || !!unlocks[blueprintKey];
+
+    if (!isTurretUnlocked) return;
+
+    set({ selectedTurretType: type });
+  },
 
   setFiring: (isFiring: boolean) => set({ isFiring }),
 
@@ -65,18 +75,22 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     let totalScrapGained = 0;
     let newVfx: CombatSlice["vfxEvents"] = [];
 
-    const weaponTemplate = REGISTRY.TURRETS[selectedTurretType];
-    if (!weaponTemplate) return;
+    // Get selected turret template
+    const turretTemplate = REGISTRY.TURRETS[selectedTurretType];
+    if (!turretTemplate) return;
 
     // Firing logic
     if (isFiring) {
-      let fireRate = resolveStat("fireRate", weaponTemplate.fireRate, upgrades);
+      let fireRate = resolveStat("fireRate", turretTemplate.fireRate, upgrades);
       if (abilityActive.find((a) => a === "OVERCLOCK")) fireRate /= 2;
 
-      if (now - lastShotTime >= fireRate) {
+      // Turret fire cooldown
+      const onCooldown = now - lastShotTime >= fireRate;
+
+      if (onCooldown) {
         const baseDamage = resolveStat(
           "damage",
-          weaponTemplate.damage,
+          turretTemplate.damage,
           upgrades,
         );
         const sentryBonus =
@@ -91,7 +105,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           ? (baseDamage + sentryBonus) * 2
           : baseDamage + sentryBonus;
 
-        const bulletSpeed = (weaponTemplate as any).bulletSpeed ?? 6.0;
+        const bulletSpeed = (turretTemplate as any).bulletSpeed ?? 6.0;
 
         activeBullets.push({
           id: crypto.randomUUID(),
@@ -150,19 +164,19 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         }
 
         // Apply damage to the hit enemy
-        if (weaponTemplate.splashRadius) {
+        if (turretTemplate.splashRadius) {
           newVfx.push({
             id: Math.random(),
             type: "EXPLOSION",
             pos: hitEnemy.position,
-            radius: weaponTemplate.splashRadius,
+            radius: turretTemplate.splashRadius,
           });
 
           currentEnemies = currentEnemies.map((e) => {
             const sdx = e.position.x - hitEnemy!.position.x;
             const sdy = e.position.y - hitEnemy!.position.y;
             const sdist = Math.sqrt(sdx * sdx + sdy * sdy);
-            return sdist <= (weaponTemplate.splashRadius ?? 0)
+            return sdist <= (turretTemplate.splashRadius ?? 0)
               ? { ...e, hp: e.hp - bullet.damage }
               : e;
           });

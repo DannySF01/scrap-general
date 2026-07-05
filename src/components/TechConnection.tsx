@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useLayoutEffect, useState } from "react";
+import { useGameStore } from "../store/useGameStore";
 
 export default function TechConnection({
   fromId,
@@ -8,9 +9,13 @@ export default function TechConnection({
   fromId: string;
   toId: string;
 }) {
+  const { upgrades } = useGameStore();
   const [coords, setCoords] = useState({ x1: 0, y1: 0, x2: 0, y2: 0 });
-  /*  const isParentUnlocked = upgrades[fromId] > 0;
-  const color = isParentUnlocked ? "stroke-indigo-500" : "stroke-slate-800"; */
+
+  const isParentUnlocked = (upgrades[fromId] || 0) > 0;
+  const strokeColor = isParentUnlocked
+    ? "stroke-orange-500/40"
+    : "stroke-stone-900/60";
 
   useLayoutEffect(() => {
     const updateLines = () => {
@@ -23,27 +28,45 @@ export default function TechConnection({
         const sRect = startEl.getBoundingClientRect();
         const eRect = endEl.getBoundingClientRect();
 
+        const scrollOffsetLeft = container.scrollLeft;
+
         setCoords({
-          x1: sRect.left + sRect.width / 2 - cRect.left,
-          y1: sRect.bottom - cRect.top,
-          x2: eRect.left + eRect.width / 2 - cRect.left,
-          y2: eRect.top - cRect.top,
+          x1: sRect.right - cRect.left + scrollOffsetLeft,
+          y1: sRect.top + sRect.height / 2 - cRect.top,
+
+          x2: eRect.left - cRect.left + scrollOffsetLeft,
+          y2: eRect.top + eRect.height / 2 - cRect.top,
         });
       }
     };
 
-    updateLines();
+    const timerId = setTimeout(updateLines, 0);
+
     window.addEventListener("resize", updateLines);
-    return () => window.removeEventListener("resize", updateLines);
-  }, [fromId, toId]);
+
+    const startEl = document.getElementById(`node-${fromId}`);
+    const container = startEl?.closest("main");
+    if (container) {
+      container.addEventListener("scroll", updateLines, { passive: true });
+    }
+
+    return () => {
+      clearTimeout(timerId);
+      window.removeEventListener("resize", updateLines);
+      if (container) container.removeEventListener("scroll", updateLines);
+    };
+  }, [fromId, toId, upgrades]);
+
+  const midX = coords.x1 + (coords.x2 - coords.x1) / 2;
 
   return (
     <motion.path
-      d={`M ${coords.x1} ${coords.y1} L ${coords.x1} ${coords.y1 + 20} L ${coords.x2} ${coords.y2 - 20} L ${coords.x2} ${coords.y2}`}
-      strokeWidth="2"
+      d={`M ${coords.x1} ${coords.y1} L ${midX} ${coords.y1} L ${midX} ${coords.y2} L ${coords.x2} ${coords.y2}`}
+      strokeWidth="1.5"
       initial={{ pathLength: 0 }}
       animate={{ pathLength: 1 }}
-      className="stroke-indigo-500/30"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className={`${strokeColor} transition-colors duration-200 fill-none`}
     />
   );
 }

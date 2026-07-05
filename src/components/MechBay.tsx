@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
-import {
-  ArrowLeft,
-  Lock,
-  Unlock,
-  Hammer,
-  Cpu,
-  LayoutGrid,
-  Layers,
-} from "lucide-react";
+import { ArrowLeft, Lock, Unlock, Cpu, LayoutGrid, Layers } from "lucide-react";
 import { REGISTRY } from "../data/registry";
 import type { Blueprint } from "../types/game";
 
@@ -28,86 +20,80 @@ export default function MechBay() {
     "TURRETS" | "EXPANSIONS" | "ABILITIES"
   >("TURRETS");
 
-  const BLUEPRINTS = Object.values(REGISTRY.BLUEPRINTS);
-
-  const filteredItems = BLUEPRINTS.filter((item) => item.tab === activeTab);
+  const BLUEPRINTS = Object.values(REGISTRY.BLUEPRINTS || {});
+  const filteredItems = BLUEPRINTS.filter(
+    (item: any) => item.tab === activeTab,
+  );
 
   return (
-    <div className="h-full w-full bg-slate-950 font-mono flex flex-col p-12 overflow-hidden relative">
-      {/* BACKGROUND GRID */}
-      <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-size-[24px_24px] opacity-20 pointer-events-none" />
-
-      {/* HEADER */}
-      <header className="flex justify-between items-start border-b-2 border-slate-900 pb-6 z-10">
+    <div className="h-full w-full bg-[#0c0a09] font-mono flex flex-col p-12 overflow-hidden relative select-none">
+      <header className="flex justify-between items-start border-b border-stone-900/60 pb-6 z-10 shrink-0">
         <div className="flex items-center gap-6">
           <button
             onClick={() => setView("MAIN")}
-            className="p-3 bg-slate-900 border border-slate-800 text-slate-500 hover:text-white hover:border-indigo-500/50 transition-all rounded-xs"
+            className="p-2.5 bg-stone-900/40 border border-stone-900 hover:border-stone-800 text-stone-400 hover:text-white rounded-sm cursor-pointer transition-colors duration-150"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={14} />
           </button>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-              <Hammer className="text-indigo-500" size={28} /> Mechanic Bay
+          <div className="text-left">
+            <h1 className="text-2xl font-light tracking-[0.18em] text-stone-100 uppercase leading-none mb-1">
+              MECHANIC BAY
             </h1>
-            <p className="text-[9px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-0.5">
-              Structural upgrades, turret tuning, Ability upgrades
+            <p className="text-[8px] text-stone-500 font-bold tracking-widest uppercase">
+              Structural upgrades, turret modifications, and utility expansions
             </p>
           </div>
         </div>
 
-        {/* MATERIAL DISPLAY */}
-        <div className="flex gap-4 bg-slate-900/40 border border-slate-950 p-3 rounded-xs backdrop-blur-sm">
+        <div className="flex gap-5 bg-stone-950/40 border border-stone-900/50 px-4 py-2 rounded-sm shadow-md">
           <MaterialDisplay
-            label="Scrap"
+            label="SCRAP"
             val={scrap}
             unit="SC"
-            color="text-emerald-400"
+            color="text-stone-300"
           />
-          <div className="w-px bg-slate-800 self-stretch" />
+          <div className="w-px bg-stone-900 self-stretch opacity-60" />
           <MaterialDisplay
-            label="Alloy"
+            label="ALLOY"
             val={alloy}
             unit="AL"
-            color="text-indigo-400"
+            color="text-stone-400"
           />
-          <div className="w-px bg-slate-800 self-stretch" />
+          <div className="w-px bg-slate-900 self-stretch opacity-60" />
           <MaterialDisplay
-            label="Core"
+            label="CORE"
             val={core}
             unit="C"
-            color="text-amber-500"
+            color="text-orange-500/80"
           />
         </div>
       </header>
 
-      {/* TABS */}
-      <div className="flex gap-3 my-8 z-10">
+      <div className="flex gap-1 bg-stone-950/40 p-1 border border-stone-900/50 rounded-sm my-6 z-10 w-fit">
         <TerminalTab
           label="Turret Upgrades"
           active={activeTab === "TURRETS"}
           onClick={() => setActiveTab("TURRETS")}
-          icon={<Cpu size={12} />}
+          icon={<Cpu size={11} />}
         />
         <TerminalTab
           label="Expansions"
           active={activeTab === "EXPANSIONS"}
           onClick={() => setActiveTab("EXPANSIONS")}
-          icon={<LayoutGrid size={12} />}
+          icon={<LayoutGrid size={11} />}
         />
         <TerminalTab
           label="Ability Upgrades"
           active={activeTab === "ABILITIES"}
           onClick={() => setActiveTab("ABILITIES")}
-          icon={<Layers size={12} />}
+          icon={<Layers size={11} />}
         />
       </div>
 
-      {/* BLUEPRINT DISPLAY */}
       <main className="flex-1 overflow-y-auto pr-2 z-10 custom-scrollbar">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((bp) => {
+            {filteredItems.map((bp: any) => {
               const isProgressive = typeof bp.maxLevel === "number";
               const currentLvl = upgrades[bp.id] || 0;
               const isMaxed = isProgressive && currentLvl >= (bp.maxLevel ?? 0);
@@ -122,121 +108,117 @@ export default function MechBay() {
                 (cost_alloy ? alloy >= cost_alloy : true) &&
                 (cost_core ? core >= cost_core : true);
 
+              let cardStyle =
+                "bg-stone-900/20 border-stone-900/60 hover:border-stone-800 text-stone-300";
+              if (isUnlocked || isMaxed) {
+                cardStyle =
+                  "bg-orange-500/5 border-orange-950/40 text-stone-400";
+              }
+
               return (
                 <motion.div
                   layout
                   key={bp.id}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className={`p-5 border flex flex-col justify-between rounded-sm relative overflow-hidden backdrop-blur-md transition-all
-                    ${
-                      isUnlocked || isMaxed
-                        ? "bg-emerald-950/5 border-emerald-900/50 shadow-[inset_0_0_30px_rgba(16,185,129,0.02)]"
-                        : "bg-slate-900/20 border-slate-900 hover:border-slate-800"
-                    }`}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.18 }}
+                  className={`p-4 border flex flex-col justify-between rounded-sm relative overflow-hidden backdrop-blur-xs min-h-42.5
+                    ${cardStyle}`}
                 >
                   <div>
-                    <div className="flex justify-between items-start gap-4 mb-2">
-                      <div>
+                    <div className="flex justify-between items-start gap-4 mb-3">
+                      <div className="text-left">
                         <SourceBadge source={bp.source} />
                         <h3
-                          className={`text-sm font-black uppercase tracking-tight mt-2 ${isUnlocked || currentLvl > 0 ? "text-indigo-400" : "text-white"}`}
+                          className={`text-[11px] font-bold uppercase tracking-widest mt-2 ${isUnlocked || currentLvl > 0 ? "text-orange-500/80" : "text-stone-100"}`}
                         >
                           {bp.title}
                         </h3>
                       </div>
-                      <div className="p-2 bg-slate-950 border border-slate-900 rounded-xs text-[10px] font-black text-slate-500">
+
+                      <div className="px-2 py-0.5 bg-stone-950/60 border border-stone-900 text-[8px] font-bold text-stone-500 tracking-wider uppercase rounded-2xs">
                         {isProgressive ? (
-                          `LVL ${currentLvl}/${bp.maxLevel}`
+                          `RK ${currentLvl}/${bp.maxLevel}`
                         ) : isUnlocked ? (
-                          <Unlock size={12} className="text-emerald-400" />
+                          <Unlock size={10} className="text-orange-500/70" />
                         ) : (
-                          <Lock size={12} />
+                          <Lock size={10} className="text-stone-700" />
                         )}
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-400 leading-normal mb-6 pr-4">
+                    <p className="text-[9px] tracking-wide text-stone-500 leading-relaxed font-sans text-left normal-case mb-4 pr-2">
                       {bp.description}
                     </p>
                   </div>
 
-                  <div className="border-t border-slate-900/60 pt-4 flex justify-between items-end mt-auto">
+                  <div className="border-t border-stone-900/50 pt-3 flex justify-between items-center mt-auto">
                     {!isUnlocked && !isMaxed ? (
-                      <div>
-                        <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mb-1">
-                          Source Pipeline Cost
+                      <div className="text-left select-none">
+                        <p className="text-[7.5px] text-stone-600 font-bold uppercase tracking-wider mb-0.5">
+                          RESOURCES REQUIRED
                         </p>
-                        <div className="flex gap-3 text-[10px] font-black">
-                          {bp.source === "SCRAP" && (
+                        <div className="flex gap-2.5 font-mono text-[9px] font-bold">
+                          {cost_scrap > 0 && (
                             <span
                               className={
-                                canAfford ? "text-emerald-400" : "text-red-400"
+                                scrap >= cost_scrap
+                                  ? "text-stone-300"
+                                  : "text-rose-500/80"
                               }
                             >
-                              {cost_scrap} SC
+                              {cost_scrap}SC
                             </span>
                           )}
-                          {bp.source === "MATERIAL_DROP" && (
-                            <>
-                              {cost_scrap && (
-                                <span
-                                  className={
-                                    scrap >= cost_scrap
-                                      ? "text-emerald-400"
-                                      : "text-red-400"
-                                  }
-                                >
-                                  {cost_scrap} SC
-                                </span>
-                              )}
-                              {cost_alloy && (
-                                <span
-                                  className={
-                                    alloy >= cost_alloy
-                                      ? "text-indigo-400"
-                                      : "text-red-400"
-                                  }
-                                >
-                                  {cost_alloy} AL
-                                </span>
-                              )}
-                            </>
-                          )}
-                          {bp.source === "MISSION_REWARD" && (
+                          {cost_alloy > 0 && (
                             <span
                               className={
-                                core >= (cost_core ?? 0)
-                                  ? "text-amber-500"
-                                  : "text-red-400"
+                                alloy >= cost_alloy
+                                  ? "text-stone-400"
+                                  : "text-rose-500/80"
                               }
                             >
-                              {cost_core} C
+                              {cost_alloy}AL
                             </span>
                           )}
-                          {bp.source === "STORE" && (
-                            <span className="text-purple-400 font-bold tracking-widest">
-                              [ SHOP ONLY ]
+                          {cost_core > 0 && (
+                            <span
+                              className={
+                                core >= cost_core
+                                  ? "text-orange-500/80"
+                                  : "text-rose-500/80"
+                              }
+                            >
+                              {cost_core}C
                             </span>
                           )}
                         </div>
                       </div>
                     ) : (
-                      <p className="text-[10px] text-emerald-500 uppercase ">
-                        {isMaxed ? "Already Max Level" : "Already Unlocked"}
-                      </p>
+                      <div className="text-left">
+                        <span className="text-[8px] font-bold tracking-widest text-orange-500/40 uppercase">
+                          {isMaxed ? "MAXED" : "UNLOCKED"}
+                        </span>
+                      </div>
                     )}
 
-                    {bp.source !== "STORE" && !isUnlocked && !isMaxed && (
+                    {!isMaxed && !isUnlocked && (
                       <button
-                        disabled={!canAfford}
-                        onClick={() =>
-                          isProgressive
-                            ? purchaseUpgrade(bp.id, bp.cost)
-                            : purchaseUnlock(bp.id)
-                        }
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xs transition-all shadow-md shadow-indigo-600/10 border border-transparent hover:border-indigo-400/20 disabled:border-transparent"
+                        onClick={() => {
+                          if (!canAfford) return;
+                          if (isProgressive) {
+                            purchaseUpgrade(bp.id, bp.cost);
+                          } else {
+                            purchaseUnlock(bp.id);
+                          }
+                        }}
+                        className={`px-3 py-1 text-[9px] font-bold uppercase rounded-sm border transition-colors duration-150
+                          ${
+                            canAfford
+                              ? "bg-stone-900 border-stone-800 text-stone-300 hover:border-stone-600 hover:text-white cursor-pointer"
+                              : "bg-transparent border-stone-900/40 text-stone-700 pointer-events-none"
+                          }`}
                       >
                         {isProgressive ? "Upgrade" : "Unlock"}
                       </button>
@@ -270,24 +252,32 @@ function TerminalTab({ label, active, onClick, icon }: any) {
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2.5 border text-[10px] font-black tracking-widest uppercase transition-all rounded-xs flex items-center gap-2
-      ${active ? "bg-indigo-600/10 border-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.1)]" : "bg-slate-900/30 border-slate-900 text-slate-500 hover:border-slate-800 hover:text-slate-300"}`}
+      className={`px-3 py-1.5 border text-[9px] font-bold tracking-widest uppercase transition-colors duration-150 flex items-center gap-2 rounded-sm cursor-pointer
+      ${
+        active
+          ? "bg-orange-500/10 border-orange-900/50 text-orange-400"
+          : "bg-stone-900/30 border-stone-900/60 text-stone-500 hover:border-stone-800 hover:text-stone-300"
+      }`}
     >
-      {icon} {label}
+      {icon && <span className="opacity-60 scale-90">{icon}</span>}
+      {label}
     </button>
   );
 }
 
 function SourceBadge({ source }: { source: Blueprint["source"] }) {
   const styles = {
-    SCRAP: "border-emerald-900/40 text-emerald-500 bg-emerald-500/5",
-    MATERIAL_DROP: "border-indigo-900/40 text-indigo-400 bg-indigo-400/5",
-    MISSION_REWARD: "border-amber-900/40 text-amber-500 bg-amber-500/5",
-    STORE: "border-purple-900/40 text-purple-400 bg-purple-500/5 animate-pulse",
+    SCRAP: "border-stone-900 text-stone-400 bg-stone-950/20",
+    MATERIAL_DROP: "border-stone-900 text-stone-400 bg-stone-950/20",
+    MISSION_REWARD: "border-orange-950/40 text-orange-500 bg-orange-500/5",
+    STORE: "border-orange-950/40 text-orange-400 bg-orange-500/5",
   };
+
   return (
     <span
-      className={`text-[8px] font-black px-2 py-0.5 rounded-xs border tracking-wider uppercase ${styles[source]}`}
+      className={`text-[7.5px] font-bold px-1.5 py-0.5 rounded-2xs border tracking-widest uppercase inline-block select-none
+        ${styles[source] || "border-stone-900 text-stone-500"}
+      `}
     >
       {source.replace("_", " ")}
     </span>
@@ -295,6 +285,5 @@ function SourceBadge({ source }: { source: Blueprint["source"] }) {
 }
 
 function dynamicCost(baseCost: number, currentLevel: number) {
-  const finalCost = baseCost * (currentLevel + 1);
-  return finalCost;
+  return baseCost * (currentLevel + 1);
 }

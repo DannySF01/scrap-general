@@ -1,21 +1,66 @@
 import React from "react";
-import type { Turret } from "../types/game";
 
-export const TURRET_SKINS: Record<Turret["type"], React.FC> = {
-  SENTRY: () => (
-    <div className="absolute -top-3 inset-x-0 flex justify-between px-1 pointer-events-none animate-in fade-in zoom-in-95 duration-155">
-      <div className="w-1 h-4 bg-linear-to-t from-slate-600 to-slate-400 border-x border-t border-slate-500 rounded-t-3xs" />
-      <div className="w-1 h-4 bg-linear-to-t from-slate-600 to-slate-400 border-x border-t border-slate-500 rounded-t-3xs" />
+import sentryImg from "../assets/turrets/sentry.png";
+import sniperImg from "../assets/turrets/sniper.png";
+import rocketImg from "../assets/turrets/rocket.png";
+
+interface TurretSkinProps {
+  isIcon?: boolean;
+}
+
+export const SentrySkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
+  return (
+    <div className="w-20 h-20 relative pointer-events-none transition-transform duration-75">
+      <img
+        src={sentryImg}
+        alt="Sentry Turret"
+        className="w-full h-full object-contain filter brightness-[1.05] contrast-[1.1]"
+        style={{
+          transform: isIcon
+            ? "scale(1.0) translateY(0%)"
+            : "scale(1.1) translateY(0%)",
+        }}
+      />
     </div>
-  ),
-  SNIPER: () => (
-    <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-1 h-6 bg-linear-to-t from-slate-800 via-slate-600 to-slate-400 border-t border-slate-400 rounded-t-full flex items-start justify-center pointer-events-none animate-in fade-in zoom-in-95 duration-155">
-      <div className="w-2 h-0.5 bg-rose-500 shadow-[0_0_5px_#f43f5e] -translate-y-0.5 rounded-full" />
+  );
+};
+
+export const SniperSkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
+  return (
+    <div className="w-20 h-20 relative pointer-events-none transition-transform duration-75">
+      <img
+        src={sniperImg}
+        alt="Sniper Turret"
+        className="w-full h-full object-contain filter brightness-[1.05] contrast-[1.1] "
+        style={{
+          transform: isIcon
+            ? "scale(1.0) translateY(0%)"
+            : "scale(1.1) translateY(-15%)",
+        }}
+      />
     </div>
-  ),
-  ROCKET: () => (
-    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-2.5 h-5 bg-linear-to-t from-slate-700 to-slate-500 border border-slate-400 rounded-t-xs shadow-md flex items-start justify-center p-0.5 pointer-events-none animate-in fade-in zoom-in-95 duration-155">
-      <div className="w-full h-1 bg-orange-500 shadow-[0_0_6px_#10b981] rounded-3xs animate-pulse" />
+  );
+};
+
+export const RocketSkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
+  return (
+    <div className="w-20 h-20 relative pointer-events-none transition-transform duration-75">
+      <img
+        src={rocketImg}
+        alt="Rocket Turret"
+        className="w-full h-full object-contain filter brightness-[1.05] contrast-[1.1] "
+        style={{
+          transform: isIcon
+            ? "scale(1.0) translateY(0%)"
+            : "scale(1.1) translateY(0%)",
+        }}
+      />
     </div>
-  ),
+  );
+};
+
+export const TURRET_SKINS = {
+  SENTRY: SentrySkin,
+  SNIPER: SniperSkin,
+  ROCKET: RocketSkin,
 };

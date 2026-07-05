@@ -62,7 +62,7 @@ export const REGISTRY: {
       spawnChance: 80,
       color: "red",
       icon: Minion,
-      size: 20,
+      size: 25,
     },
     ARMORED_MINION: {
       id: "ARMORED_MINION",
@@ -76,7 +76,7 @@ export const REGISTRY: {
       spawnChance: 20,
       color: "slate",
       icon: ArmoredMinion,
-      size: 25,
+      size: 30,
     },
     REGENERATOR: {
       id: "REGENERATOR", // PASSIVE: REGENERATE HP OVER TIME
@@ -231,7 +231,9 @@ export const REGISTRY: {
     },
   },
   UPGRADES: {
-    // --- FORTRESS CATEGORY ---
+    // =========================================================================
+    // DEFENCE CATEGORY
+    // =========================================================================
     REINFORCED_CORE: {
       id: "REINFORCED_CORE",
       category: "FORTRESS",
@@ -259,6 +261,7 @@ export const REGISTRY: {
       id: "THORNS_PROTOCOL",
       category: "FORTRESS",
       tier: 2,
+      requires: ["REINFORCED_CORE"],
       name: "Thorns Protocol",
       description: "Enemies take 10% of their max HP when hitting base.",
       cost: { scrap: 1200 },
@@ -270,7 +273,7 @@ export const REGISTRY: {
       id: "NANO_REPAIR",
       category: "FORTRESS",
       tier: 3,
-      requires: ["REINFORCED_CORE"],
+      requires: ["EMERGENCY_SHIELD"],
       name: "Nano-Repair Bots",
       description: "Passively restores 2 HP every 5 seconds.",
       cost: { scrap: 1500 },
@@ -282,6 +285,7 @@ export const REGISTRY: {
       id: "BLAST_DAMPENERS",
       category: "FORTRESS",
       tier: 3,
+      requires: ["THORNS_PROTOCOL"],
       name: "Blast Dampeners",
       description: "Reduces Tank enemy damage by 15%.",
       cost: { scrap: 1000 },
@@ -293,7 +297,7 @@ export const REGISTRY: {
       id: "STATIC_DISCHARGE",
       category: "FORTRESS",
       tier: 4,
-      requires: ["THORNS_PROTOCOL"],
+      requires: ["NANO_REPAIR"],
       name: "Static Discharge",
       description: "Shockwave every 10th hit taken.",
       cost: { scrap: 2000 },
@@ -305,6 +309,7 @@ export const REGISTRY: {
       id: "OVERDRIVE_CAPS",
       category: "FORTRESS",
       tier: 4,
+      requires: ["BLAST_DAMPENERS"],
       name: "Overdrive Capacitors",
       description: "Fire 20% faster when base HP is below 25%.",
       cost: { scrap: 1800 },
@@ -316,7 +321,7 @@ export const REGISTRY: {
       id: "HARDENED_ALLOY",
       category: "FORTRESS",
       tier: 5,
-      requires: ["BLAST_DAMPENERS"],
+      requires: ["STATIC_DISCHARGE"],
       name: "Hardened Alloy",
       description: "Flat -2 damage reduction from all attacks.",
       cost: { scrap: 2500 },
@@ -328,7 +333,7 @@ export const REGISTRY: {
       id: "LAST_STAND",
       category: "FORTRESS",
       tier: 5,
-      requires: ["REINFORCED_CORE"],
+      requires: ["STATIC_DISCHARGE", "OVERDRIVE_CAPS"],
       name: "Last Stand",
       description: "Stay at 1 HP for 5s once per 2 mins.",
       cost: { scrap: 5000 },
@@ -340,6 +345,7 @@ export const REGISTRY: {
       id: "COMMAND_AURA",
       category: "FORTRESS",
       tier: 5,
+      requires: ["OVERDRIVE_CAPS"],
       name: "Command Aura",
       description: "Take 10% less damage while abilities are active.",
       cost: { scrap: 3000 },
@@ -348,7 +354,9 @@ export const REGISTRY: {
       modifiers: { abilityResistMult: 0.1 },
     },
 
-    // --- ROBOTICS CATEGORY ---
+    // =========================================================================
+    // OFFENSIVE CATEGORY
+    // =========================================================================
     HF_TRIGGERS: {
       id: "HF_TRIGGERS",
       category: "ROBOTICS",
@@ -399,6 +407,7 @@ export const REGISTRY: {
       id: "AP_ROUNDS",
       category: "ROBOTICS",
       tier: 3,
+      requires: ["SENTRY_SPEC"],
       name: "AP Rounds",
       description: "Deal 20% more damage to Tank enemies.",
       cost: { scrap: 1200 },
@@ -410,7 +419,7 @@ export const REGISTRY: {
       id: "DUAL_BARREL",
       category: "ROBOTICS",
       tier: 3,
-      requires: ["HF_TRIGGERS"],
+      requires: ["SNIPER_PIERCE"],
       name: "Dual-Barrel Mod",
       description: "5% chance to fire two projectiles.",
       cost: { scrap: 2500 },
@@ -422,6 +431,7 @@ export const REGISTRY: {
       id: "HEAT_MGMT",
       category: "ROBOTICS",
       tier: 4,
+      requires: ["AP_ROUNDS"],
       name: "Heat Management",
       description: "Reduces reload delays by 15%.",
       cost: { scrap: 1400 },
@@ -433,7 +443,7 @@ export const REGISTRY: {
       id: "TARGETING_LINK",
       category: "ROBOTICS",
       tier: 4,
-      requires: ["CALIBRATED_OPTICS"],
+      requires: ["DUAL_BARREL"],
       name: "Targeting Link",
       description: "+5% damage per robot on same target.",
       cost: { scrap: 3000 },
@@ -445,7 +455,7 @@ export const REGISTRY: {
       id: "EXPLOSIVE_PAYLOAD",
       category: "ROBOTICS",
       tier: 5,
-      requires: ["AP_ROUNDS"],
+      requires: ["HEAT_MGMT"],
       name: "Explosive Payload",
       description: "10% chance for kills to cause AOE.",
       cost: { scrap: 3500 },
@@ -457,6 +467,7 @@ export const REGISTRY: {
       id: "ALPHA_STRIKE",
       category: "ROBOTICS",
       tier: 5,
+      requires: ["TARGETING_LINK"],
       name: "Alpha Strike",
       description: "First shot on new target deals +50%.",
       cost: { scrap: 4000 },
@@ -465,7 +476,9 @@ export const REGISTRY: {
       modifiers: { firstShotMult: 0.5 },
     },
 
-    // --- LOGISTICS CATEGORY ---
+    // =========================================================================
+    // LOGISTICS CATEGORY
+    // =========================================================================
     DEEP_SCAVENGING: {
       id: "DEEP_SCAVENGING",
       category: "LOGISTICS",
@@ -493,6 +506,7 @@ export const REGISTRY: {
       id: "EFFICIENCY_EXPERT",
       category: "LOGISTICS",
       tier: 2,
+      requires: ["DEEP_SCAVENGING"],
       name: "Efficiency Expert",
       description: "Unlocking new base slots costs 20% less.",
       cost: { scrap: 800 },
@@ -504,6 +518,7 @@ export const REGISTRY: {
       id: "LUCKY_FIND",
       category: "LOGISTICS",
       tier: 3,
+      requires: ["BOUNTY_HUNTER"],
       name: "Lucky Find",
       description: "+5% chance for x5 Large Scrap.",
       cost: { scrap: 1200 },
@@ -527,6 +542,7 @@ export const REGISTRY: {
       id: "SALVAGE_OPTIMIZER",
       category: "LOGISTICS",
       tier: 4,
+      requires: ["LUCKY_FIND"],
       name: "Salvage Optimizer",
       description: "Permanently increases Luck stat by +2.",
       cost: { scrap: 1500 },
@@ -538,7 +554,7 @@ export const REGISTRY: {
       id: "WAVE_BONUS",
       category: "LOGISTICS",
       tier: 4,
-      requires: ["DEEP_SCAVENGING"],
+      requires: ["INTEREST_RATES"],
       name: "Wave Bonus",
       description: "+100 Scrap bonus every 5 waves.",
       cost: { scrap: 2500 },
@@ -550,6 +566,7 @@ export const REGISTRY: {
       id: "RAPID_DEPLOY",
       category: "LOGISTICS",
       tier: 5,
+      requires: ["SALVAGE_OPTIMIZER", "WAVE_BONUS"],
       name: "Rapid Deployment",
       description: "Faster robot respawn after destruction.",
       cost: { scrap: 1800 },
@@ -561,7 +578,7 @@ export const REGISTRY: {
       id: "MARKET_FLIP",
       category: "LOGISTICS",
       tier: 5,
-      requires: ["INTEREST_RATES"],
+      requires: ["WAVE_BONUS"],
       name: "Market Flip",
       description: "Other Tech Tree upgrades cost 5% less.",
       cost: { scrap: 4000 },
@@ -573,7 +590,7 @@ export const REGISTRY: {
       id: "GOLDEN_SCRAP",
       category: "LOGISTICS",
       tier: 5,
-      requires: ["LUCKY_FIND"],
+      requires: ["WAVE_BONUS"],
       name: "Golden Scrap",
       description: "1% chance for massive Core Fragment drop.",
       cost: { scrap: 5000 },

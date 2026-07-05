@@ -148,8 +148,8 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         }
 
         // Moves enemies until they hit the base
-        if (currentY < 68) {
-          currentY = Math.min(68, currentY + e.speed * timeStepMultiplier);
+        if (currentY < 64) {
+          currentY = Math.min(64, currentY + e.speed * timeStepMultiplier);
         }
 
         return {
@@ -161,7 +161,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
 
       return {
         enemies: [...updatedEnemies, ...spawnedFromOverlord].filter((e) => {
-          if (e.position.y >= 68) {
+          if (e.position.y >= 64) {
             // Scales base damage value down to smooth frame-time fractions
             const wallDamage = e.damage * 0.01 * timeStepMultiplier;
             takeDamage(wallDamage);

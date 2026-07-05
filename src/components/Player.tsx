@@ -1,36 +1,32 @@
 import { useGameStore } from "../store/useGameStore";
 import { TURRET_SKINS } from "./TurretSkins";
+import tankImg from "../assets/Player/tank.png";
 
 export default function Player() {
   const selectedTurret = useGameStore((state) => state.selectedTurretType);
   const ActiveTurretSkin = TURRET_SKINS[selectedTurret];
 
   return (
-    <div className="w-full h-full relative flex flex-col items-center justify-center">
-      {/* Heavy metal tracks */}
-      <div className="absolute -left-0.5 top-0 bottom-0 w-3 bg-slate-900 border-2 border-slate-700 rounded-sm" />
-      <div className="absolute -right-0.5 top-0 bottom-0 w-3 bg-slate-900 border-2 border-slate-700 rounded-sm" />
+    <div className="w-30 h-30 relative flex items-center justify-center will-change-transform select-none pointer-events-none">
+      <div className="absolute inset-6 bg-black/30 rounded-full filter blur-sm translate-y-4 translate-x-2 mix-blend-multiply z-0" />
 
-      {/* Vehicle hull */}
-      <div className="w-10 h-10 bg-linear-to-b from-slate-750 via-slate-800 to-slate-850 border-2 border-slate-600 rounded-md flex items-center justify-center relative z-10">
-        {/* Turret mount ring */}
-        <div className="w-6 h-6 bg-slate-900 border border-slate-500 rounded-full flex items-center justify-center relative shadow-inner z-20">
-          {/* Lens emitter capsule ring */}
-          <div className="w-2.5 h-2.5 bg-slate-800 border border-slate-600 rounded-full flex items-center justify-center">
-            <div
-              className={`w-1 h-1 rounded-full ${
-                selectedTurret === "ROCKET"
-                  ? "bg-orange-500"
-                  : selectedTurret === "SNIPER"
-                    ? "bg-red-400"
-                    : "bg-indigo-400"
-              }`}
-            />
+      <div
+        className="absolute inset-0 z-10 mix-blend-multiply"
+        style={{
+          backgroundImage: `url(${tankImg})`,
+          backgroundSize: "contain",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          filter: "brightness(0.8) contrast(1.4) saturate(0.9)",
+        }}
+      />
+
+      <div className="absolute top-[34%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-16 h-16 z-20 flex items-center justify-center">
+        {ActiveTurretSkin ? (
+          <div className=" transition-transform duration-200 filter brightness-[1.1] contrast-[1.2]">
+            <ActiveTurretSkin />
           </div>
-
-          {/* Render active turret */}
-          {ActiveTurretSkin && <ActiveTurretSkin />}
-        </div>
+        ) : null}
       </div>
     </div>
   );

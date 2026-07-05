@@ -9,6 +9,7 @@ import { useEffect, useRef } from "react";
 import Player from "./Player";
 import { BulletCanvas } from "./BulletCanvas";
 import { useTurretHotkeys } from "../hooks/useTurretHotkeys";
+import desertBackground from "../assets/Fields/Desert/desert.png";
 
 export function Arena() {
   const { enemies, abilityActive, status } = useGameStore();
@@ -33,7 +34,7 @@ export function Arena() {
 
       // Limits player position within arena
       mousePos.current.x = Math.max(3, Math.min(97, xPercent));
-      mousePos.current.y = Math.max(73, Math.min(83, yPercent));
+      mousePos.current.y = Math.max(79, Math.min(85, yPercent));
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -100,16 +101,11 @@ export function Arena() {
       className="relative w-full h-full bg-slate-950 overflow-hidden"
       style={status === "PLAYING" ? { cursor: "none" } : { cursor: "default" }}
     >
-      <UpperTerminal />
-      <WaveAlert />
+      <Battlefield />
 
-      <div
-        ref={playerRef}
-        className="absolute w-12 h-12 z-30 pointer-events-none will-change-[left,top]"
-        style={{ left: "50%", top: "80%", transform: "translate(-50%, -50%)" }}
-      >
-        <Player />
-      </div>
+      <UpperTerminal />
+
+      <WaveAlert />
 
       <BulletCanvas />
 
@@ -123,8 +119,70 @@ export function Arena() {
           <div className="fire-glow" />
         </div>
       )}
+
+      <div
+        ref={playerRef}
+        className="absolute w-30 h-30 z-30 pointer-events-none will-change-[left,top]"
+        style={{ left: "50%", top: "80%", transform: "translate(-50%, -50%)" }}
+      >
+        <Player />
+      </div>
+
       <BaseWall />
       <CommandCenter />
     </div>
   );
 }
+
+const Battlefield = () => {
+  return (
+    <div className="absolute inset-0 pointer-events-none select-none overflow-hidden z-0">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url(${desertBackground})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          filter: "brightness(0.4) saturate(0.85) contrast(1.15)",
+          transform: "scale(1.05)",
+        }}
+      />
+
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(40,18,6,.12), rgba(15,8,2,.45))",
+          mixBlendMode: "multiply",
+        }}
+      />
+
+      <div
+        className="absolute top-[68%] inset-x-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 45%, transparent 100%)",
+          height: "90px",
+          transform: "translateY(16px)",
+          mixBlendMode: "multiply",
+        }}
+      />
+
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(
+              ellipse at center,
+              transparent 30%,
+              rgba(0,0,0,0.3) 60%,
+              rgba(0,0,0,0.9) 100%
+            )
+          `,
+          mixBlendMode: "multiply",
+        }}
+      />
+    </div>
+  );
+};

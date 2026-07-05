@@ -2,6 +2,7 @@ import { useDragScroll } from "../hooks/useDragScroll";
 import { CheckCircle2, Skull } from "lucide-react";
 import type LevelConfig from "../types/levels";
 import { CAMPAIGN_MANIFEST } from "../data/levels";
+
 interface ChapterRowProps {
   levels: LevelConfig[];
   completedLevels: string[];
@@ -24,7 +25,7 @@ export function ChapterRow({
       onMouseLeave={dragScroll.onMouseLeave}
       onMouseUp={dragScroll.onMouseUp}
       onMouseMove={dragScroll.onMouseMove}
-      className={`flex items-center gap-0 overflow-x-auto py-4 px-2 max-w-full overflow-y-hidden custom-horizontal-scrollbar select-none
+      className={`flex items-center gap-0 overflow-x-auto py-3 px-1 max-w-full overflow-y-hidden custom-horizontal-scrollbar select-none
         ${dragScroll.isDown ? "cursor-grabbing" : "cursor-grab"}`}
     >
       {levels.map((lvl: LevelConfig) => {
@@ -32,59 +33,65 @@ export function ChapterRow({
         const isUnlocked = isLevelUnlocked(lvl, completedLevels);
         const isBossStage = lvl.name.includes("BOSS");
 
+        let cardStyle =
+          "bg-stone-900/20 border-stone-900/60 text-stone-300 hover:border-stone-800";
+        if (isBeaten) {
+          cardStyle = "bg-stone-900/10 border-stone-900/40 text-stone-400";
+        } else if (isUnlocked && isBossStage) {
+          cardStyle =
+            "bg-orange-500/5 border-orange-950/40 hover:border-orange-500/50";
+        } else if (!isUnlocked) {
+          cardStyle =
+            "bg-transparent border-transparent opacity-15 pointer-events-none grayscale";
+        }
+
         return (
           <div key={lvl.id} className="flex items-center shrink-0">
             <div
-              className={`w-70 p-5 border flex flex-col justify-between rounded-lg h-55 mx-2 backdrop-blur-sm transition-all text-left
-              ${
-                isBeaten
-                  ? "bg-emerald-950/5 border-emerald-500/20"
-                  : isUnlocked
-                    ? isBossStage
-                      ? "bg-red-950/10 border-red-500/60 hover:border-red-500 shadow-[0_0_25px_rgba(239,104,104,0.05)]"
-                      : "bg-indigo-950/10 border-indigo-500/40 hover:border-indigo-500"
-                    : "bg-slate-950/40 border-slate-900/60 opacity-20 pointer-events-none grayscale"
-              }`}
+              className={`w-64 p-4 border flex flex-col justify-between rounded-sm h-48 mx-2 transition-all duration-150 text-left
+                ${cardStyle}
+              `}
             >
               <div>
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-center mb-3">
                   <span
-                    className={`text-[8px] font-black tracking-widest px-1.5 py-0.5 rounded-xs border uppercase
-                    ${isBossStage ? "border-red-900 text-red-400 bg-red-500/5" : "border-slate-800 text-slate-400"}`}
+                    className={`text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded-2xs border uppercase
+                    ${isBossStage ? "border-orange-900/40 text-orange-500 bg-orange-500/5" : "border-stone-900 text-stone-500"}`}
                   >
-                    LEVEL {lvl.id}
+                    SEC {lvl.id}
                   </span>
                   {isBeaten ? (
-                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <CheckCircle2 size={12} className="text-stone-400" />
                   ) : (
                     isBossStage && (
-                      <Skull size={14} className="text-red-400 animate-pulse" />
+                      <Skull size={12} className="text-orange-500/70" />
                     )
                   )}
                 </div>
 
-                <h3 className="text-xs font-black text-white uppercase tracking-tight line-clamp-1">
-                  {lvl.name.replace("BOSS:", "💀")}
+                <h3 className="text-[11px] font-bold text-stone-100 uppercase tracking-widest line-clamp-1">
+                  {lvl.name.replace("BOSS:", "")}
                 </h3>
-                <p className="text-[10px] text-slate-400 leading-normal mt-1.5 line-clamp-3">
+
+                <p className="text-[9px] tracking-wide text-stone-500 mt-2 line-clamp-3 font-sans normal-case leading-relaxed">
                   {isUnlocked
                     ? lvl.description
-                    : "COGNITIVE BLOCK PROTOCOLS ENGAGED."}
+                    : "Locked — Vector coordinates unavailable."}
                 </p>
               </div>
 
-              <div className="border-t border-slate-900 pt-3 flex justify-between items-center mt-auto">
-                <div className="flex flex-col gap-0.5 text-[9px] font-black">
-                  <span className="text-slate-300">REWARDS</span>
-                  <div className="flex gap-3">
+              <div className="border-t border-stone-900/50 pt-2 flex justify-between items-center mt-auto">
+                <div className="flex flex-col gap-0.5 text-[8px] font-bold tracking-wider select-none">
+                  <span className="text-stone-600">CARGO</span>
+                  <div className="flex gap-2.5 font-mono">
                     {lvl.rewards.scrap && (
-                      <span className="text-emerald-400">
-                        {lvl.rewards.scrap} SC
+                      <span className="text-stone-300">
+                        +{lvl.rewards.scrap} SCRAP
                       </span>
                     )}
                     {lvl.rewards.core && (
-                      <span className="text-amber-500">
-                        {lvl.rewards.core} CORE
+                      <span className="text-orange-500/80">
+                        +{lvl.rewards.core} CORE
                       </span>
                     )}
                   </div>
@@ -96,14 +103,14 @@ export function ChapterRow({
                       selectLevel(lvl.id);
                       startGame();
                     }}
-                    className={`px-3 py-1.5 text-[9px] font-black uppercase rounded-sm border cursor-pointer 
+                    className={`px-3 py-1 text-[9px] font-bold uppercase rounded-sm border cursor-pointer transition-colors duration-150
                       ${
                         isBossStage
-                          ? "bg-red-600 text-white border-transparent hover:bg-red-500 shadow-md shadow-red-500/10"
-                          : "bg-indigo-600 border-transparent text-white hover:bg-indigo-500"
+                          ? "bg-orange-500/10 border-orange-900/60 text-orange-400 hover:border-orange-500 hover:text-orange-300"
+                          : "bg-stone-900 border-stone-800 text-stone-300 hover:border-stone-600 hover:text-white"
                       }`}
                   >
-                    Launch
+                    Deploy
                   </button>
                 )}
               </div>
@@ -117,9 +124,7 @@ export function ChapterRow({
 
 function isLevelUnlocked(level: LevelConfig, completedLevels: string[]) {
   const [chapterId, levelId] = level.id.split("-");
-
   if (level.id === "1-1") return true;
-
   if (completedLevels.includes(`${chapterId}-${Number(levelId) - 1}`))
     return true;
 
