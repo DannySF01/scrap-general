@@ -150,12 +150,11 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         // Napalm damage enemies each tick
         if (isNapalmActive) nextHp -= 1 * timeStepMultiplier;
 
-        // REGENERATOR regenerates hp each tick
+        // REGENERATOR regenerates 10% of max hp per second
         if (e.type === "REGENERATOR" && nextHp > 0 && nextHp < e.maxHp) {
-          nextHp = Math.min(
-            e.maxHp,
-            nextHp + e.maxHp * 0.01 * timeStepMultiplier,
-          );
+          const flatRegenPerFrame = ((e.maxHp * 0.1) / 60) * timeStepMultiplier;
+
+          nextHp = Math.min(e.maxHp, nextHp + flatRegenPerFrame);
         }
 
         // Moves enemies until they hit the base

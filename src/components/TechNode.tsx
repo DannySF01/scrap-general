@@ -8,11 +8,13 @@ interface TechNodeProps {
   level: number;
 }
 
-export default function TechNode({ node, level }: TechNodeProps) {
-  const { upgrades, purchaseUpgrade } = useGameStore();
+export default function TechNode({ node, level = 0 }: TechNodeProps) {
+  const { upgrades, purchaseUpgrade, scrap } = useGameStore();
 
   const isLocked = node.requires?.some((req) => (upgrades[req] || 0) === 0);
   const isMaxed = level >= node.maxLevel;
+
+  const nextCost = node.cost.scrap * (level + 1);
 
   let nodeStyle =
     "border-stone-900 bg-stone-900/30 hover:border-stone-800 text-stone-300";
@@ -24,6 +26,12 @@ export default function TechNode({ node, level }: TechNodeProps) {
   }
 
   const projections = node.modifiers ? getProjectedStat(node.id, upgrades) : [];
+
+  // If it's the last 2 columns, show tooltip on the left
+  const isLastColumn = node.tier >= 4;
+  const tooltipPlacementClasses = isLastColumn
+    ? "right-full mr-3 origin-right"
+    : "left-full ml-3 origin-left";
 
   return (
     <div className="relative group/node select-none">
@@ -63,7 +71,9 @@ export default function TechNode({ node, level }: TechNodeProps) {
         </div>
       </button>
 
-      <div className="absolute left-full top-0 ml-3 w-72 bg-stone-950 border border-stone-900 p-4 rounded-sm shadow-2xl z-50 backdrop-blur-xs flex flex-col pointer-events-none opacity-0 scale-95 transition-all duration-100 ease-out group-hover/node:opacity-100 group-hover/node:scale-100 origin-left">
+      <div
+        className={`absolute top-0 w-72 bg-stone-950 border border-stone-900 p-4 rounded-sm shadow-2xl z-50 backdrop-blur-xs flex flex-col pointer-events-none opacity-0 scale-95 transition-all duration-100 ease-out group-hover/node:opacity-100 group-hover/node:scale-100 ${tooltipPlacementClasses}`}
+      >
         <div className="flex justify-between items-start mb-2">
           <h2 className="text-[12px] font-bold text-stone-100 uppercase tracking-wider">
             {node.name}
@@ -119,21 +129,27 @@ export default function TechNode({ node, level }: TechNodeProps) {
                   <p className="text-[8px] text-stone-600 font-bold uppercase tracking-wider">
                     Cost
                   </p>
-                  <p className="text-[10px] text-stone-300 font-bold font-mono">
-                    {node.cost.scrap} SC
-                  </p>
+                  {nextCost > scrap ? (
+                    <p className="text-[10px] text-rose-500 font-bold font-mono">
+                      {nextCost} SC
+                    </p>
+                  ) : (
+                    <p className="text-[10px] text-stone-300 font-bold font-mono">
+                      {nextCost} SC
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className="text-[9px] text-orange-500/80 font-bold uppercase tracking-wider">
-                  Max Rank
+                  Max Level
                 </p>
               )}
               <div className="text-right">
                 <p className="text-[8px] text-stone-600 font-bold uppercase tracking-wider">
-                  Rank
+                  Level
                 </p>
                 <p className="text-[10px] text-orange-500 font-bold font-mono">
-                  {level} / {node.maxLevel}
+                  {level || 0} / {node.maxLevel}
                 </p>
               </div>
             </>

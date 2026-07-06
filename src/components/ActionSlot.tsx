@@ -13,12 +13,12 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
 
   if (!abilityId) {
     return (
-      <div className="relative flex flex-col items-center justify-center min-w-15 min-h-15  rounded-xl border-2 border-slate-900 bg-slate-950 opacity-30 h-full w-full grayscale">
-        <span className="absolute top-2 left-2 text-[10px] text-slate-400 font-bold">
+      <div className="relative flex flex-col items-center justify-center w-14 h-14 rounded-sm border border-stone-900/40 bg-stone-950/20 opacity-30 select-none pointer-events-none">
+        <span className="absolute top-1 left-1.5 text-[8px] text-stone-600 font-bold font-mono">
           {hotkey}
         </span>
-        <Lock size={16} className="text-slate-400" />
-        <span className="text-[8px] font-black mt-2 text-slate-400 uppercase tracking-widest">
+        <Lock size={12} className="text-stone-700 shrink-0" />
+        <span className="text-[7.5px] font-bold mt-1 text-stone-600 uppercase tracking-widest leading-none scale-90">
           LOCKED
         </span>
       </div>
@@ -36,64 +36,89 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
   const cooldownPercent = (remainingTime / config.cooldown) * 100;
   const isOnCooldown = cooldownPercent > 0;
 
+  // Dynamic status styling
+  let statusStyle =
+    "border-stone-900 bg-stone-950/40 hover:border-stone-800 text-stone-400 hover:text-stone-200 cursor-pointer active:translate-y-0.5 group";
+  if (isActive) {
+    statusStyle = "border-orange-500/60 bg-orange-500/10 text-orange-400";
+  } else if (!isAffordable) {
+    statusStyle =
+      "bg-stone-950/20 border-stone-950 text-stone-600 cursor-not-allowed opacity-50 grayscale";
+  } else if (isLocked) {
+    statusStyle =
+      "bg-stone-950/30 border-stone-950 opacity-40 cursor-not-allowed";
+  }
+
   return (
     <button
       disabled={isLocked}
       onClick={() => triggerAbility(abilityId)}
-      className={`relative flex flex-col items-center justify-center min-w-15 h-15 rounded-xl border-2 transition-all overflow-hidden
-      ${
-        isLocked
-          ? "bg-slate-950 border-slate-900 opacity-40 cursor-not-allowed"
-          : !isAffordable
-            ? "bg-slate-900 border-slate-800 opacity-60 cursor-not-allowed grayscale"
-            : isActive
-              ? "bg-indigo-500/20 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-              : "bg-slate-900 border-slate-800 hover:border-indigo-500 hover:bg-slate-800 active:translate-y-0.5 cursor-pointer group"
-      }`}
+      className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-sm border transition-all overflow-hidden font-mono select-none pt-2
+        ${statusStyle}
+      `}
     >
+      {/* COOLDOWN BAR */}
       {isOnCooldown && (
         <div
-          className="absolute bottom-0 left-0 w-full bg-indigo-500/30 pointer-events-none transition-all duration-100"
+          className="absolute bottom-0 left-0 w-full bg-orange-500/10 pointer-events-none transition-all duration-100"
           style={{ height: `${cooldownPercent}%` }}
         />
       )}
 
+      {/* COOLDOWN TIMER */}
       {isOnCooldown && (
-        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white bg-slate-950/40">
+        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold font-mono text-orange-400 bg-stone-950/70 z-20">
           {(remainingTime / 1000).toFixed(0)}s
         </span>
       )}
 
-      <span className="absolute top-2 left-2 text-[10px] text-slate-600 font-bold group-hover:text-indigo-400/50">
+      {/* HOTKEY NUMBER */}
+      <span
+        className={`absolute top-0.5 left-1 text-[8px] font-bold font-mono transition-colors rounded-2xs px-0.5 leading-none scale-90 z-20
+        ${isActive ? "bg-orange-500/20 text-orange-400 border border-orange-500/30" : "bg-stone-900 text-stone-500 group-hover:text-stone-400"}
+      `}
+      >
         {hotkey}
       </span>
 
+      {/* ABILITY ICON */}
       <div
-        className={`transition-colors ${
+        className={`transition-colors shrink-0 z-10 filter brightness-[0.85] contrast-[1.2] ${
           isActive
-            ? "text-indigo-400"
+            ? "text-orange-400"
             : isLocked
-              ? "text-slate-800"
-              : "text-slate-400 group-hover:text-indigo-400"
+              ? "text-stone-700"
+              : "text-stone-400 group-hover:text-orange-500/80"
         }`}
       >
-        {<Icon size={16} />}
+        <Icon size={13} />
       </div>
 
+      {/* ABILITY TYPE */}
       <span
-        className={`text-[10px] font-black mt-1 uppercase tracking-tight ${isActive ? "text-indigo-200" : "text-slate-300"}`}
+        className={`text-[7.5px] font-bold uppercase tracking-widest mt-1 scale-90 leading-none z-10 max-w-12.5 truncate ${
+          isActive ? "text-orange-300" : "text-stone-400"
+        }`}
       >
         {config.type}
       </span>
 
+      {/* SCRAP COST */}
       <span
-        className={`text-[10px] font-bold italic ${!isAffordable && "text-red-500"}`}
+        className={`text-[7.5px] font-mono tracking-tight mt-0.5 leading-none z-10 ${
+          isActive
+            ? "text-orange-600/70"
+            : !isAffordable
+              ? "text-rose-500/70 font-bold"
+              : "text-stone-600 font-medium group-hover:text-stone-500"
+        }`}
       >
-        {config.cost} SC
+        {config.cost}SC
       </span>
 
+      {/* PULSE ANIMATION WHEN ACTIVE */}
       {isActive && (
-        <div className="absolute inset-0 bg-indigo-500/10 animate-pulse pointer-events-none" />
+        <div className="absolute inset-0 bg-orange-500/5 animate-pulse pointer-events-none z-0" />
       )}
     </button>
   );

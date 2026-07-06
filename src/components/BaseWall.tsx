@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
 
-import desertWallImg from "../assets/Fields/Desert/desert_wall.png";
+import desertWallImg from "../assets/fields/desert/desert_wall.png";
 
 export function BaseWall() {
   const { baseHp, hp } = useGameStore();

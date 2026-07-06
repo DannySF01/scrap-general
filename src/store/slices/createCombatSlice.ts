@@ -204,13 +204,16 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       });
     }
 
+    // Calculate bonus scrap from tech
+    const bonusScrapPayout = resolveStat("scrapFlat", 0, upgrades);
+
     // Remove dead enemies
     const survivingEnemies = currentEnemies.filter((e) => {
       if (e.hp <= 0) {
         // Register enemy death time
         if (!e.destroyedAt) {
           e.destroyedAt = Date.now();
-          totalScrapGained += e.reward;
+          totalScrapGained += e.reward + bonusScrapPayout;
         }
 
         // Keep enemy dead for 500ms

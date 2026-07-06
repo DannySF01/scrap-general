@@ -1,6 +1,6 @@
 import { useGameStore } from "../store/useGameStore";
 import { TURRET_SKINS } from "./TurretSkins";
-import tankImg from "../assets/Player/tank.png";
+import tankImg from "../assets/player/tank.png";
 
 export default function Player() {
   const selectedTurret = useGameStore((state) => state.selectedTurretType);
