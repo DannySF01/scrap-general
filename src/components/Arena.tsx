@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 import Player from "./Player";
 import { BulletCanvas } from "./BulletCanvas";
 import { useTurretHotkeys } from "../hooks/useTurretHotkeys";
-import desertBackground from "../assets/Fields/Desert/desert.png";
+import desertBackground from "../assets/fields/desert/desert.png";
 
 export function Arena() {
   const { enemies, abilityActive, status } = useGameStore();

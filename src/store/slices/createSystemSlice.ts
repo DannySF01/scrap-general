@@ -17,6 +17,8 @@ export interface SystemSlice {
   maxHp: number;
   currentView: MenuView;
   currentLevelId: string;
+  lastRegenTime: number;
+  isEmergencyRepairSpent: boolean;
 
   setView: (view: MenuView) => void;
   startGame: () => void;
@@ -25,7 +27,6 @@ export interface SystemSlice {
   resetGame: () => void;
   quitGame: () => void;
   addScrap: (amount: number) => void;
-  takeDamage: (amount: number) => void;
   syncStats: () => void;
 }
 
@@ -44,6 +45,8 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
   baseHp: 100,
   maxHp: 100,
   currentLevelId: "1-1",
+  lastRegenTime: Date.now(),
+  isEmergencyRepairSpent: false,
 
   setView: (view) => set({ currentView: view }),
 
@@ -99,15 +102,6 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
     set((state) => ({
       scrap: state.scrap + amount,
     })),
-
-  takeDamage: (amount) =>
-    set((state) => {
-      const newHp = Math.max(0, state.hp - amount);
-      return {
-        hp: newHp,
-        status: newHp <= 0 ? "GAME_OVER" : state.status,
-      };
-    }),
 
   syncStats: () => {
     const { upgrades, baseHp } = get();

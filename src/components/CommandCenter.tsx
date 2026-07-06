@@ -8,7 +8,8 @@ import { TurretHotbar } from "./TurretHotbar";
 import { resolveStat } from "../utils/stats";
 
 export default function CommandCenter() {
-  const { unlocks, hp, maxHp, upgrades } = useGameStore();
+  const { unlocks, hp, maxHp, isEmergencyRepairSpent, upgrades } =
+    useGameStore();
   const [hoveredMetric, setHoveredMetric] = useState<"HEALTH" | "STATS" | null>(
     null,
   );
@@ -16,6 +17,7 @@ export default function CommandCenter() {
   const dmgMult = resolveStat("damage", 1, upgrades);
   const fireRateMult = 1 / resolveStat("fireRate", 1, upgrades);
   const critMult = resolveStat("critChance", 0, upgrades) * 100;
+  const hpRegen = resolveStat("regenFlat", 0, upgrades);
 
   const unlockedAbilities = Object.entries(REGISTRY.ABILITIES).filter(
     ([key]) => unlocks[`ABILITY_${key}`],
@@ -52,6 +54,24 @@ export default function CommandCenter() {
                       <span className="text-stone-100">
                         {Math.ceil(hp)} / {maxHp} HP
                       </span>
+                    </div>
+                    <div className="flex justify-between font-mono border-t border-stone-900/50 pt-1 mt-0.5">
+                      <span>NANO REPAIR RATE:</span>
+                      {hpRegen > 0 ? (
+                        <span className="text-emerald-400 font-bold">
+                          +{hpRegen} HP / 5s
+                        </span>
+                      ) : (
+                        <span className="text-stone-600">0.0 HP / 5s</span>
+                      )}
+                    </div>
+                    <div className="flex justify-between font-mono border-t border-stone-900/50 pt-1 mt-0.5">
+                      <span>EMERGENCY REPAIR:</span>
+                      {isEmergencyRepairSpent ? (
+                        <span className="text-red-500">UNAVAILABLE</span>
+                      ) : (
+                        <span className="text-emerald-400">AVAILABLE</span>
+                      )}
                     </div>
                   </div>
                 </motion.div>

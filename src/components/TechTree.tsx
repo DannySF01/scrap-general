@@ -63,7 +63,7 @@ export function TechTree() {
         </div>
       </div>
 
-      <main className="relative flex-1 overflow-x-auto overflow-y-hidden flex items-center py-4 custom-horizontal-scrollbar">
+      <main className="relative flex-1 overflow-hidden flex items-center py-4 custom-horizontal-scrollbar">
         <svg className="absolute pointer-events-none inset-0 w-full h-full stroke-stone-900 fill-none z-0">
           {categoryNodes.map((node) =>
             node.requires?.map((reqId) => {

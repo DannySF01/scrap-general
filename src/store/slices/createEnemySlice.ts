@@ -3,6 +3,7 @@ import type { Enemy } from "../../types/game";
 import { REGISTRY } from "../../data/registry";
 import type { GameState } from "../useGameStore";
 import { LEVELS_MANIFEST } from "../../data/levels";
+import { resolveStat } from "../../utils/stats";
 
 export interface EnemySlice {
   enemies: Enemy[];
@@ -94,13 +95,14 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
 
   tickEnemies: (dt: number) => {
     const {
-      takeDamage,
       currentLevelId,
       wave,
       enemies,
       waveTimeLeft,
       abilityActive,
       markLevelCompleted,
+      upgrades,
+      lastRegenTime,
     } = get();
 
     const levelData = LEVELS_MANIFEST[currentLevelId];
@@ -113,6 +115,15 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
     let spawnedFromOverlord: Enemy[] = [];
 
     const timeStepMultiplier = dt / 16.666;
+
+    // NANO REPAIR BOTS (TECH)
+    let healingPayout = 0;
+    let wallDamagePayout = 0;
+
+    if (now - lastRegenTime >= 5000) {
+      healingPayout = resolveStat("regenFlat", 0, upgrades);
+      set({ lastRegenTime: now });
+    }
 
     set((state) => {
       const updatedEnemies = state.enemies.map((e) => {
@@ -159,16 +170,42 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         };
       });
 
+      const filteredEnemies = [
+        ...updatedEnemies,
+        ...spawnedFromOverlord,
+      ].filter((e) => {
+        if (e.position.y >= 64) {
+          wallDamagePayout += e.damage * 0.01 * timeStepMultiplier;
+        }
+        return true;
+      });
+
+      let rawHpCalculated = state.hp + healingPayout - wallDamagePayout;
+
+      // Emergency repair (Gain +50hp if below 25% of max hp)
+      let usedEmergencyRepair = state.isEmergencyRepairSpent;
+      const hasEmergencyRepair = upgrades["EMERGENCY_REPAIR"];
+
+      if (hasEmergencyRepair && !state.isEmergencyRepairSpent) {
+        const criticalThreshold = state.maxHp * 0.25;
+        if (rawHpCalculated < criticalThreshold) {
+          usedEmergencyRepair = true;
+          rawHpCalculated += 50;
+        }
+      }
+
+      // Final hp calculation
+      const finalHp = Math.max(0, Math.min(state.maxHp, rawHpCalculated));
+
+      if (finalHp <= 0)
+        return {
+          status: "GAME_OVER",
+        };
+
       return {
-        enemies: [...updatedEnemies, ...spawnedFromOverlord].filter((e) => {
-          if (e.position.y >= 64) {
-            // Scales base damage value down to smooth frame-time fractions
-            const wallDamage = e.damage * 0.01 * timeStepMultiplier;
-            takeDamage(wallDamage);
-            return true;
-          }
-          return true;
-        }),
+        enemies: filteredEnemies,
+        hp: finalHp,
+        isEmergencyRepairSpent: usedEmergencyRepair,
       };
     });
 
@@ -209,6 +246,8 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
             : state.currentLevelId,
           wave: 0,
           waveTimeLeft: 30000,
+          isEmergencyRepairSpent: false,
+          hp: state.maxHp,
 
           // TODO : add mission rewards
         }));

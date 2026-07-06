@@ -85,7 +85,7 @@ export default function TechNode({ node, level }: TechNodeProps) {
                 className="bg-stone-900/30 p-2 border border-stone-900/40 rounded-sm flex flex-col"
               >
                 <p className="text-[8px] font-bold text-stone-500 tracking-widest mb-1 uppercase">
-                  {stat.label} METRICS
+                  {stat.label}
                 </p>
                 <div className="flex justify-between items-center font-mono">
                   <span className="text-[10px] text-stone-400 font-bold">
