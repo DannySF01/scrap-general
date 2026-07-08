@@ -8,8 +8,8 @@ import UpperTerminal from "./UpperTerminal";
 import { useEffect, useRef } from "react";
 import Player from "./Player";
 import { BulletCanvas } from "./BulletCanvas";
-import { useTurretHotkeys } from "../hooks/useTurretHotkeys";
 import desertBackground from "../assets/fields/desert/desert.png";
+import { useHotkeys } from "../hooks/useHotkeys";
 
 export function Arena() {
   const { enemies, abilityActive, status } = useGameStore();
@@ -18,7 +18,7 @@ export function Arena() {
   const arenaRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
 
-  useTurretHotkeys();
+  useHotkeys();
 
   const mousePos = useRef({ x: 50, y: 80 });
   const currentPos = useRef({ x: 50, y: 80 });

@@ -91,6 +91,8 @@ export interface Enemy {
   size: number;
   lastSpawn?: number;
   destroyedAt?: number;
+  stunnedAt?: number;
+  meltedAt?: number;
 }
 
 export interface ScrapDrop {

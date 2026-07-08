@@ -85,9 +85,9 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       if (abilityActive.find((a) => a === "OVERCLOCK")) fireRate /= 2;
 
       // Turret fire cooldown
-      const onCooldown = now - lastShotTime >= fireRate;
+      const onCooldown = now - lastShotTime <= fireRate;
 
-      if (onCooldown) {
+      if (!onCooldown) {
         const baseDamage = resolveStat(
           "damage",
           turretTemplate.damage,
@@ -107,16 +107,33 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
 
         const bulletSpeed = (turretTemplate as any).bulletSpeed ?? 6.0;
 
+        // Double shot Tech
+        const doubleShotChance = resolveStat("doubleShotChance", 0, upgrades);
+        const triggersDoubleShot = Math.random() < doubleShotChance;
+
         activeBullets.push({
           id: crypto.randomUUID(),
           x: playerPos.x,
-          y: playerPos.y, // Bullet leaves from the turret
+          y: playerPos.y,
           dirX: 0,
           dirY: -1,
           damage: finalDamage,
           speed: bulletSpeed,
           isCrit,
         });
+
+        if (triggersDoubleShot) {
+          activeBullets.push({
+            id: crypto.randomUUID(),
+            x: playerPos.x,
+            y: playerPos.y - 8,
+            dirX: 0,
+            dirY: -1,
+            damage: finalDamage,
+            speed: bulletSpeed,
+            isCrit,
+          });
+        }
 
         set({ lastShotTime: now });
       }
@@ -163,6 +180,9 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           continue;
         }
 
+        const acidChance = resolveStat("acidChance", 0, upgrades);
+        const triggersAcid = Math.random() < acidChance;
+
         // Apply damage to the hit enemy
         if (turretTemplate.splashRadius) {
           newVfx.push({
@@ -181,9 +201,31 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
               : e;
           });
         } else {
-          currentEnemies = currentEnemies.map((e) =>
-            e.id === hitEnemy!.id ? { ...e, hp: e.hp - bullet.damage } : e,
-          );
+          currentEnemies = currentEnemies.map((e) => {
+            if (e.id === hitEnemy!.id) {
+              const stunTimestamp =
+                bullet.isCrit && selectedTurretType === "SNIPER"
+                  ? now + 5000
+                  : e.stunnedAt;
+
+              // Check if the enemy is currently corroded (4sec)
+              const isCurrentlyCorroded = e.meltedAt && now < e.meltedAt + 4000;
+              const acidDamage = 0.2; // 20% damage increase
+              const acidTimestamp = triggersAcid ? now + 4000 : e.meltedAt;
+
+              const dmgMultiplier = isCurrentlyCorroded ? 1 + acidDamage : 1;
+
+              const computedDamage = bullet.damage * dmgMultiplier;
+
+              return {
+                ...e,
+                hp: e.hp - computedDamage,
+                stunnedAt: stunTimestamp,
+                meltedAt: acidTimestamp,
+              };
+            }
+            return e;
+          });
         }
 
         if (bullet.isCrit)

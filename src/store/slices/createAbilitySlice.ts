@@ -23,9 +23,11 @@ export const createAbilitySlice: StateCreator<
   triggerAbility: (type) => {
     const { scrap, cooldowns } = get();
     const config = REGISTRY.ABILITIES[type];
+    if (!config) return;
+
     const now = Date.now();
 
-    if (scrap < config.cost || (cooldowns[type] && now < cooldowns[type]))
+    if (scrap < config.cost || (cooldowns[type] && now < now + cooldowns[type]))
       return;
 
     set((state) => ({

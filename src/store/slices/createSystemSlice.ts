@@ -1,6 +1,6 @@
 import type { StateCreator } from "zustand";
 import type { GameState } from "../useGameStore";
-import type { GameStatus } from "../../types/game";
+import type { AbilityType, GameStatus } from "../../types/game";
 import { resolveStat } from "../../utils/stats";
 
 export type MenuView = "MAIN" | "MISSION_SELECT" | "TECH_TREE" | "MECH_BAY";
@@ -26,7 +26,6 @@ export interface SystemSlice {
   restartGame: () => void;
   resetGame: () => void;
   quitGame: () => void;
-  addScrap: (amount: number) => void;
   syncStats: () => void;
 }
 
@@ -68,6 +67,8 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       waveTimeLeft: 30000,
       turrets: [],
       enemies: [],
+      cooldowns: {} as Record<AbilityType, number>,
+      isEmergencyRepairSpent: false,
     });
     get().syncStats();
   },
@@ -80,6 +81,9 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       enemies: [],
       wave: 0,
       waveTimeLeft: 30000,
+      cooldowns: {} as Record<AbilityType, number>,
+      abilityActive: [],
+      isEmergencyRepairSpent: false,
     }),
 
   resetGame: () =>
@@ -89,6 +93,8 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       wave: 0,
       turrets: [],
       enemies: [],
+      cooldowns: {} as Record<AbilityType, number>,
+      abilityActive: [],
       scrap: 0,
       alloy: 0,
       core: 0,
@@ -97,11 +103,6 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       baseHp: 100,
       maxHp: 100,
     }),
-
-  addScrap: (amount) =>
-    set((state) => ({
-      scrap: state.scrap + amount,
-    })),
 
   syncStats: () => {
     const { upgrades, baseHp } = get();

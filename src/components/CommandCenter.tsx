@@ -153,7 +153,7 @@ export default function CommandCenter() {
                 abilityId={
                   targetAbility ? (targetAbility as any).type : undefined
                 }
-                hotkey={i + 1}
+                hotkey={i + 5} // Ability hotkeys start at 5 to 8
               />
             );
           })}

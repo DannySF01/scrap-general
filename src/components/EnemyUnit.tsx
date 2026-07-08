@@ -12,6 +12,10 @@ export function EnemyUnit({ enemy }: { enemy: Enemy }) {
   const config = REGISTRY.ENEMIES[enemy.type];
   const Icon = config.icon;
 
+  const now = Date.now();
+  const isStunned = enemy.stunnedAt && now < enemy.stunnedAt + 5000; // 5 seconds stun duration
+  const isCorroded = enemy.meltedAt && now < enemy.meltedAt + 4000; // 4 seconds acid duration
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -33,6 +37,20 @@ export function EnemyUnit({ enemy }: { enemy: Enemy }) {
       hpBarRef.current.style.width = `${hpPercent}%`;
       hpBarContainerRef.current.style.opacity =
         enemy.hp < enemy.maxHp ? "1" : "0";
+    }
+
+    // Apply damaging visual effects
+    if (iconWrapperRef.current && !isDying.current) {
+      if (isStunned) {
+        iconWrapperRef.current.className =
+          "transition-all duration-200 flex items-center justify-center w-full h-auto shrink-0 brightness-[1.3] contrast-[1.1] saturate-[0.2] text-cyan-500 animate-pulse";
+      } else if (isCorroded) {
+        iconWrapperRef.current.className =
+          "transition-all duration-200 flex items-center justify-center w-full h-auto shrink-0 brightness-[1.15] contrast-[1.3] saturate-[1.3] text-emerald-300 hue-rotate-180";
+      } else {
+        iconWrapperRef.current.className =
+          "transition-all duration-200 flex items-center justify-center w-full h-auto shrink-0 brightness-[1] contrast-[1] saturate-[1]";
+      }
     }
 
     // Death animation

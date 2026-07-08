@@ -101,7 +101,7 @@ export default function TechNode({ node, level = 0 }: TechNodeProps) {
                   <span className="text-[10px] text-stone-400 font-bold">
                     {stat.label === "FIRERATE"
                       ? `${(1000 / stat.current).toFixed(1)}/s`
-                      : stat.current.toFixed(1)}
+                      : stat.current.toFixed(2)}
                   </span>
                   {!isMaxed && (
                     <>

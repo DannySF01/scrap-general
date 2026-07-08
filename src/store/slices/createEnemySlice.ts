@@ -150,15 +150,18 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         // Napalm damage enemies each tick
         if (isNapalmActive) nextHp -= 1 * timeStepMultiplier;
 
+        // Check if enemy is stunned for 5 seconds
+        const isStunned = e.stunnedAt && now < e.stunnedAt;
+
         // REGENERATOR regenerates 10% of max hp per second
         if (e.type === "REGENERATOR" && nextHp > 0 && nextHp < e.maxHp) {
+          if (isStunned) return e;
           const flatRegenPerFrame = ((e.maxHp * 0.1) / 60) * timeStepMultiplier;
-
           nextHp = Math.min(e.maxHp, nextHp + flatRegenPerFrame);
         }
 
         // Moves enemies until they hit the base
-        if (currentY < 64) {
+        if (!isStunned && currentY < 64) {
           currentY = Math.min(64, currentY + e.speed * timeStepMultiplier);
         }
 
@@ -166,6 +169,7 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
           ...e,
           hp: nextHp,
           position: { ...e.position, y: currentY },
+          stunnedAt: isStunned ? e.stunnedAt : undefined,
         };
       });
 
@@ -173,7 +177,8 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         ...updatedEnemies,
         ...spawnedFromOverlord,
       ].filter((e) => {
-        if (e.position.y >= 64) {
+        const isStunned = e.stunnedAt && now < e.stunnedAt;
+        if (e.position.y >= 64 && !isStunned) {
           wallDamagePayout += e.damage * 0.01 * timeStepMultiplier;
         }
         return true;
