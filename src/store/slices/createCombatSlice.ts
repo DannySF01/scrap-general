@@ -111,28 +111,53 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
         const doubleShotChance = resolveStat("doubleShotChance", 0, upgrades);
         const triggersDoubleShot = Math.random() < doubleShotChance;
 
-        activeBullets.push({
-          id: crypto.randomUUID(),
-          x: playerPos.x,
-          y: playerPos.y,
-          dirX: 0,
-          dirY: -1,
-          damage: finalDamage,
-          speed: bulletSpeed,
-          isCrit,
-        });
+        if (selectedTurretType === "SHOTGUN") {
+          const pelletCount = 6;
 
-        if (triggersDoubleShot) {
-          activeBullets.push({
-            id: crypto.randomUUID(),
-            x: playerPos.x,
-            y: playerPos.y - 8,
-            dirX: 0,
-            dirY: -1,
-            damage: finalDamage,
-            speed: bulletSpeed,
-            isCrit,
-          });
+          // Shotgun wide spread
+          const spawnShotgunBlast = (yOffset: number) => {
+            for (let i = 0; i < pelletCount; i++) {
+              // Calculate horizontal spread
+              const spreadFraction = i / (pelletCount - 1) - 0.5;
+              const lateralDirX = spreadFraction * 0.9; // Wide scatter width multiplier
+
+              activeBullets.push({
+                id: crypto.randomUUID(),
+                x: playerPos.x,
+                y: playerPos.y + yOffset,
+                dirX: lateralDirX,
+                dirY: -1,
+                damage: finalDamage,
+                speed: bulletSpeed,
+                isCrit,
+                startY: playerPos.y + yOffset,
+                maxDistanceY: turretTemplate.maxRange,
+                isShotgunPellet: true,
+              } as any);
+            }
+          };
+
+          // Deploy primary heavy blast cluster
+          spawnShotgunBlast(-2);
+          if (triggersDoubleShot) spawnShotgunBlast(-8);
+        } else {
+          // SINGLE SHOT (Sentry, Sniper, Rocket)
+
+          const spawnSingleShot = (yOffset: number) => {
+            activeBullets.push({
+              id: crypto.randomUUID(),
+              x: playerPos.x,
+              y: playerPos.y + yOffset,
+              dirX: 0,
+              dirY: -1,
+              damage: finalDamage,
+              speed: bulletSpeed,
+              isCrit,
+            });
+          };
+
+          spawnSingleShot(-2);
+          if (triggersDoubleShot) spawnSingleShot(-8);
         }
 
         set({ lastShotTime: now });
@@ -146,12 +171,21 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
     const timeStepMultiplier = dt / 16.666; // 60fps
 
     for (const bullet of activeBullets) {
-      const nextX = bullet.x;
+      const nextX =
+        bullet.x + (bullet.dirX || 0) * bullet.speed * timeStepMultiplier;
       const nextY = bullet.y + bullet.dirY * bullet.speed * timeStepMultiplier;
 
       // Destroy bullet if it goes out of bounds
-      if (nextY < -2) {
+      if (nextY < -2 || nextX < -5 || nextX > 105) {
         continue;
+      }
+
+      //  Destroy bullet if it reaches max range
+      if ((bullet as any).isShotgunPellet) {
+        const distanceTravelledY = Math.abs((bullet as any).startY - nextY);
+        if (distanceTravelledY >= (bullet as any).maxDistanceY) {
+          continue;
+        }
       }
 
       // Check for collision with enemies

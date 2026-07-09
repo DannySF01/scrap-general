@@ -2,6 +2,7 @@ import React from "react";
 
 import sentryImg from "../assets/turrets/sentry.png";
 import sniperImg from "../assets/turrets/sniper.png";
+import shotgunImg from "../assets/turrets/shotgun.png";
 import rocketImg from "../assets/turrets/rocket.png";
 
 interface TurretSkinProps {
@@ -42,6 +43,23 @@ export const SniperSkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
   );
 };
 
+export const ShotgunSkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
+  return (
+    <div className="w-20 h-20 relative pointer-events-none transition-transform duration-75">
+      <img
+        src={shotgunImg}
+        alt="Shotgun Turret"
+        className="w-full h-full object-contain filter brightness-[1.05] contrast-[1.1] "
+        style={{
+          transform: isIcon
+            ? "scale(1.0) translateY(0%)"
+            : "scale(1.1) translateY(0%)",
+        }}
+      />
+    </div>
+  );
+};
+
 export const RocketSkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
   return (
     <div className="w-20 h-20 relative pointer-events-none transition-transform duration-75">
@@ -61,6 +79,7 @@ export const RocketSkin: React.FC<TurretSkinProps> = ({ isIcon }) => {
 
 export const TURRET_SKINS = {
   SENTRY: SentrySkin,
+  SHOTGUN: ShotgunSkin,
   SNIPER: SniperSkin,
   ROCKET: RocketSkin,
 };

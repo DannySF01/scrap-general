@@ -16,9 +16,10 @@ export const useHotkeys = () => {
           state.updateTurretType("SNIPER");
           break;
         case "3":
-          state.updateTurretType("ROCKET");
+          state.updateTurretType("SHOTGUN");
           break;
         case "4":
+          state.updateTurretType("ROCKET");
           break;
         case "5":
           state.triggerAbility("EMP");
@@ -31,7 +32,6 @@ export const useHotkeys = () => {
           break;
         case "8":
           state.triggerAbility("NAPALM");
-
           break;
         default:
           break;

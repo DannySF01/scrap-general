@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type GameStatus = "IDLE" | "PLAYING" | "PAUSED" | "GAME_OVER";
 export type Rarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
-export type TurretType = "SENTRY" | "SNIPER" | "ROCKET";
+export type TurretType = "SENTRY" | "SNIPER" | "SHOTGUN" | "ROCKET";
 export type EnemyType =
   | "MINION"
   | "ARMORED_MINION"
@@ -62,6 +62,7 @@ export interface Turret {
   fireRate: number;
   lastShot?: number;
   splashRadius?: number;
+  maxRange?: number;
   lastTargetPos?: { x: number; y: number } | null;
 }
 

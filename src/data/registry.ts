@@ -41,10 +41,17 @@ export const REGISTRY: {
       damage: 25,
       fireRate: 2500,
     },
+    SHOTGUN: {
+      id: "SHOTGUN",
+      type: "SHOTGUN",
+      damage: 40,
+      fireRate: 1500,
+      maxRange: 32,
+    },
     ROCKET: {
       id: "ROCKET",
       type: "ROCKET",
-      damage: 50,
+      damage: 75,
       fireRate: 3000,
       splashRadius: 15,
     },
@@ -622,6 +629,15 @@ export const REGISTRY: {
         "Unlocks assembly authorization for long-range piercing railgun units.",
       source: "MATERIAL_DROP",
       cost: { scrap: 3000, alloy: 12 },
+    },
+    SHOTGUN_BLUEPRINT: {
+      id: "SHOTGUN_BLUEPRINT",
+      tab: "TURRETS",
+      title: "Shotgun Blueprint",
+      description:
+        "Unlocks assembly authorization for low-range but high-damage shotgun units.",
+      source: "MATERIAL_DROP",
+      cost: { scrap: 4000, alloy: 15 },
     },
     ROCKET_BLUEPRINT: {
       id: "ROCKET_BLUEPRINT",
