@@ -102,6 +102,8 @@ export const createSystemSlice: StateCreator<GameState, [], [], SystemSlice> = (
       hp: 100,
       baseHp: 100,
       maxHp: 100,
+      upgrades: {},
+      unlocks: {},
     }),
 
   syncStats: () => {

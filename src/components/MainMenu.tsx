@@ -14,8 +14,11 @@ export function MainMenu() {
   if (status !== "IDLE") return null;
 
   return (
-    <div className="absolute inset-0 z-100 bg-stone-950 overflow-hidden font-mono select-none">
-      <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[3px_3px] pointer-events-none mix-blend-overlay" />
+    <div className="absolute inset-0 z-100 bg-stone-950 overflow-hidden font-mono select-none flex items-center justify-center">
+      <div
+        className="absolute inset-0 pointer-events-none bg-radial from-orange-500/3 via-transparent to-transparent opacity-60 z-0 animate-pulse"
+        style={{ animationDuration: "8s" }}
+      />
 
       <AnimatePresence mode="wait">
         {currentView === "MAIN" && (
@@ -25,20 +28,18 @@ export function MainMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="w-full h-full max-w-xl m-auto flex flex-col justify-center p-8 gap-10"
+            className="w-full max-w-2xl flex flex-col justify-center p-8 gap-8 relative z-20"
           >
-            <div className="text-center relative">
-              <h1 className="text-5xl font-black tracking-widest text-stone-100 uppercase leading-none mb-3">
+            <div className="text-center relative  border-stone-900/60 pb-3">
+              <h1 className="text-5xl font-black tracking-[0.24em] text-stone-100 uppercase leading-none">
                 SCRAP{" "}
-                <span className=" text-orange-500  tracking-normal">
+                <span className="text-orange-500 tracking-[0.22em]">
                   GENERAL
                 </span>
               </h1>
-
-              <div className="w-24 h-px bg-linear-to-r from-transparent via-stone-800 to-transparent m-auto mt-6" />
             </div>
 
-            <div className="flex flex-col gap-2 px-12">
+            <div className="flex flex-col gap-3.5 px-2 w-full">
               <MenuButton
                 onClick={startGame}
                 icon={<Play size={14} />}
@@ -74,12 +75,12 @@ export function MainMenu() {
                 sub="TURRET UPGRADES & EXPANSIONS"
               />
 
-              <div className="mt-4 pt-4 border-t border-stone-900/60">
+              <div className="mt-4 pt-4 border-t border-stone-900/40">
                 <MenuButton
                   onClick={() => {
                     if (
                       window.confirm(
-                        "WARNING: Operating a complete core memory wipe will delete all gathered scraps and upgrades. Confirm reset?",
+                        "WARNING: This will PERMANENTLY ERASE ALL PROGRESS. Confirm reset?",
                       )
                     ) {
                       resetGame();
@@ -101,7 +102,7 @@ export function MainMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full h-full"
+            className="w-full h-full relative z-20"
           >
             <MissionSelect />
           </motion.div>
@@ -112,7 +113,7 @@ export function MainMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full h-full"
+            className="w-full h-full relative z-20"
           >
             <TechTree />
           </motion.div>
@@ -123,7 +124,7 @@ export function MainMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full h-full"
+            className="w-full h-full relative z-20"
           >
             <MechBay />
           </motion.div>
@@ -142,41 +143,51 @@ function MenuButton({
   danger = false,
 }: any) {
   let themeClasses =
-    "bg-stone-900/40 border-stone-900 text-stone-400 hover:border-stone-800 hover:text-stone-200";
+    "bg-stone-900/20 border-stone-900 text-stone-400 hover:border-stone-700 hover:text-stone-200";
   let iconClasses = "text-stone-600 group-hover:text-orange-500/80";
 
   if (primary) {
     themeClasses =
-      "bg-orange-950/20 border-orange-900/50 text-orange-400 hover:border-orange-500 hover:text-orange-300";
+      "bg-orange-950/10 border-orange-900/40 text-orange-400 hover:border-orange-500 hover:text-orange-300";
     iconClasses = "text-orange-500";
   } else if (danger) {
     themeClasses =
-      "bg-transparent border-transparent text-stone-600 hover:text-rose-500/80 p-2 py-1";
-    iconClasses = "text-stone-700 group-hover:text-rose-600/60";
+      "bg-stone-950/20 border-stone-900/40 text-stone-500 hover:border-rose-950 hover:text-rose-400";
+    iconClasses = "text-stone-700 group-hover:text-rose-500/70";
   }
 
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-4 px-4 py-2 border rounded-xs transition-all duration-150 group text-left cursor-pointer
+      className={`w-full flex items-center gap-4 border rounded-sm transition-all duration-150 group text-left cursor-pointer active:translate-y-0.5 relative overflow-hidden
+        ${danger ? "py-3 px-6" : "py-4 px-6"}
         ${themeClasses}
       `}
     >
+      {!danger ? (
+        <div
+          className={`absolute left-0 top-0 h-full w-0.5 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-150 ease-out
+            ${primary ? "bg-orange-500" : "bg-stone-400"}`}
+        />
+      ) : (
+        <div className="absolute left-0 top-0 h-full w-0.5 bg-rose-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-150 ease-out" />
+      )}
+
       <div
         className={`transition-colors duration-150 flex items-center justify-center shrink-0 ${iconClasses}`}
       >
         {icon}
       </div>
 
-      <div className="flex flex-col select-none">
+      <div className="flex flex-col select-none relative z-10">
         <p
-          className={`text-[11px] font-bold tracking-widest uppercase leading-tight ${primary ? "font-black" : ""}`}
+          className={`text-[11px] font-bold tracking-[0.16em] uppercase leading-tight ${primary ? "font-black" : ""}`}
         >
           {label}
         </p>
         <p
-          className={`text-[7.5px] tracking-wider font-mono uppercase mt-0.5
-          ${primary ? "text-orange-600/60" : danger ? "text-stone-700" : "text-stone-600"}
+          className={`text-[7.5px] tracking-widest font-mono uppercase mt-1
+          ${primary ? "text-orange-600/60" : danger ? "text-stone-600" : "text-stone-500"}
         `}
         >
           {sub}

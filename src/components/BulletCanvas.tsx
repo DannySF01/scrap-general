@@ -36,6 +36,13 @@ export const BulletCanvas: React.FC = () => {
 
         ctx.save();
 
+        // Bullet rotation
+        const angle = bullet.dirX
+          ? Math.atan2(bullet.dirY, bullet.dirX) + Math.PI / 2
+          : 0;
+        ctx.translate(pixelX, pixelY);
+        ctx.rotate(angle);
+
         // Bullet Styling (Standard Bullet)
         ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
         ctx.shadowBlur = 3;
@@ -58,6 +65,29 @@ export const BulletCanvas: React.FC = () => {
           colorEnd = "#b45309";
         }
 
+        // Bullet muzzle flash
+        if (bullet.y >= 77) {
+          ctx.save();
+
+          ctx.beginPath();
+          ctx.arc(0, bulletHeight / 2, bulletWidth * 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = "#f59e0b";
+          ctx.filter = "blur(3px)";
+          ctx.fill();
+
+          // Bullet sparks
+          ctx.strokeStyle = "#fed7aa";
+          ctx.lineWidth = 1.5;
+          for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, bulletHeight / 2);
+            // Spits sparks slightly forward and out
+            ctx.lineTo((i - 1) * 8, -bulletHeight);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
         // Bullet gradient for metalic look
         const gradient = ctx.createLinearGradient(
           pixelX - bulletWidth / 2,
@@ -72,23 +102,24 @@ export const BulletCanvas: React.FC = () => {
 
         // Draw bullet
         ctx.beginPath();
-        ctx.moveTo(pixelX - bulletWidth / 2, pixelY + bulletHeight / 2);
-        ctx.lineTo(pixelX - bulletWidth / 2, pixelY - bulletHeight / 4);
+        ctx.moveTo(-bulletWidth / 2, bulletHeight / 2);
+        ctx.lineTo(-bulletWidth / 2, -bulletHeight / 4);
         ctx.quadraticCurveTo(
-          pixelX - bulletWidth / 2,
-          pixelY - bulletHeight / 2,
-          pixelX,
-          pixelY - bulletHeight / 2,
+          -bulletWidth / 2,
+          -bulletHeight / 2,
+          0,
+          -bulletHeight / 2,
         );
         ctx.quadraticCurveTo(
-          pixelX + bulletWidth / 2,
-          pixelY - bulletHeight / 4,
-          pixelX + bulletWidth / 2,
-          pixelY - bulletHeight / 4,
+          bulletWidth / 2,
+          -bulletHeight / 4,
+          bulletWidth / 2,
+          -bulletHeight / 4,
         );
-        ctx.lineTo(pixelX + bulletWidth / 2, pixelY + bulletHeight / 2);
+        ctx.lineTo(bulletWidth / 2, bulletHeight / 2);
         ctx.closePath();
         ctx.fill();
+
         ctx.restore();
       });
 

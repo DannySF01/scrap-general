@@ -1,8 +1,13 @@
-import { ArmoredMinion } from "../assets/enemies/ArmoredMinion";
-import { Minion } from "../assets/enemies/Minion";
-import { Overlord } from "../assets/enemies/Overlord";
-import { Regenerator } from "../assets/enemies/Regenerator";
-import { Shielder } from "../assets/enemies/Shielder";
+import Minion from "../assets/enemies/Minion.png";
+import ArmoredMinion from "../assets/enemies/ArmoredMinion.png";
+import Regenerator from "../assets/enemies/Regenerator.png";
+import CrusherPrime from "../assets/enemies/CrusherPrime.png";
+import Overlord from "../assets/enemies/Overlord.png";
+import NexusGhost from "../assets/enemies/NexusGhost.png";
+import ApexStalker from "../assets/enemies/ApexStalker.png";
+import Shielder from "../assets/enemies/Shielder.png";
+import OvershieldTitan from "../assets/enemies/OvershieldTitan.png";
+import Apocalypse from "../assets/enemies/Apocalypse.png";
 import type { Ability, Blueprint, Enemy, Turret, Upgrade } from "../types/game";
 import {
   Crosshair,
@@ -15,11 +20,6 @@ import {
   Wrench,
   Zap,
 } from "lucide-react";
-import { ApexStalker } from "../assets/enemies/ApexStalker";
-import { OvershieldTitan } from "../assets/enemies/OvershieldTitan";
-import { NexusGhost } from "../assets/enemies/NexusGhost";
-import { Apocalypse } from "../assets/enemies/Apocalypse";
-import { CrusherPrime } from "../assets/enemies/CrusherPrime";
 
 export const REGISTRY: {
   TURRETS: Record<Turret["type"], Turret>;
@@ -39,20 +39,20 @@ export const REGISTRY: {
       id: "SNIPER",
       type: "SNIPER",
       damage: 25,
-      fireRate: 2500,
+      fireRate: 1500,
     },
     SHOTGUN: {
       id: "SHOTGUN",
       type: "SHOTGUN",
-      damage: 40,
-      fireRate: 1500,
+      damage: 30,
+      fireRate: 2000,
       maxRange: 32,
     },
     ROCKET: {
       id: "ROCKET",
       type: "ROCKET",
       damage: 75,
-      fireRate: 3000,
+      fireRate: 2500,
       splashRadius: 15,
     },
   },
@@ -63,13 +63,12 @@ export const REGISTRY: {
       hp: 20,
       maxHp: 20,
       damage: 10,
-      speed: 0.2,
+      speed: 0.18,
       reward: 10,
       position: { x: 0, y: 0 },
       spawnChance: 80,
-      color: "red",
       icon: Minion,
-      size: 25,
+      size: 40,
     },
     ARMORED_MINION: {
       id: "ARMORED_MINION",
@@ -81,12 +80,11 @@ export const REGISTRY: {
       reward: 30,
       position: { x: 0, y: 0 },
       spawnChance: 20,
-      color: "slate",
       icon: ArmoredMinion,
-      size: 30,
+      size: 60,
     },
     REGENERATOR: {
-      id: "REGENERATOR", // PASSIVE: REGENERATE HP OVER TIME
+      id: "REGENERATOR", // PASSIVE: REGENERATE ALLIES HP OVER TIME
       type: "REGENERATOR",
       hp: 150,
       maxHp: 150,
@@ -94,10 +92,9 @@ export const REGISTRY: {
       speed: 0.04,
       reward: 100,
       position: { x: 0, y: 0 },
-      spawnChance: 5,
-      color: "green",
+      spawnChance: 20,
       icon: Regenerator,
-      size: 40,
+      size: 70,
     },
     SHIELDER: {
       id: "SHIELDER", // PASSIVE: 20% TO BLOCK DAMAGE
@@ -109,9 +106,8 @@ export const REGISTRY: {
       reward: 100,
       position: { x: 0, y: 0 },
       spawnChance: 5,
-      color: "indigo",
       icon: Shielder,
-      size: 40,
+      size: 70,
     },
     APEX_STALKER: {
       id: "APEX_STALKER",
@@ -122,10 +118,9 @@ export const REGISTRY: {
       speed: 0.25,
       reward: 60,
       position: { x: 0, y: 0 },
-      spawnChance: 5,
-      color: "cyan",
+      spawnChance: 20,
       icon: ApexStalker,
-      size: 24,
+      size: 70,
     },
     OVERSHIELD_TITAN: {
       id: "OVERSHIELD_TITAN",
@@ -136,10 +131,9 @@ export const REGISTRY: {
       speed: 0.05,
       reward: 150,
       position: { x: 0, y: 0 },
-      spawnChance: 1,
-      color: "amber",
+      spawnChance: 20,
       icon: OvershieldTitan,
-      size: 36,
+      size: 90,
     },
     OVERLORD: {
       id: "OVERLORD", // MINIBOSS : SPAWN 5 MINIONS EVERY 10 SECONDS
@@ -150,10 +144,9 @@ export const REGISTRY: {
       speed: 0.03,
       reward: 500,
       position: { x: 0, y: 0 },
-      spawnChance: 1,
-      color: "#f59e0b",
+      spawnChance: 20,
       icon: Overlord,
-      size: 80,
+      size: 150,
     },
     CRUSHER_PRIME: {
       id: "CRUSHER_PRIME",
@@ -161,13 +154,12 @@ export const REGISTRY: {
       hp: 800,
       maxHp: 800,
       damage: 999999, // INSTANT KILL
-      speed: 0.05,
+      speed: 0.02,
       reward: 350,
       position: { x: 0, y: 0 },
       spawnChance: 1,
-      color: "rose",
       icon: CrusherPrime,
-      size: 120,
+      size: 200,
     },
     NEXUS_GHOST: {
       id: "NEXUS_GHOST",
@@ -179,9 +171,8 @@ export const REGISTRY: {
       reward: 750,
       position: { x: 0, y: 0 },
       spawnChance: 1,
-      color: "purple",
       icon: NexusGhost,
-      size: 140,
+      size: 300,
     },
 
     APOCALYPSE: {
@@ -194,9 +185,8 @@ export const REGISTRY: {
       reward: 2500,
       position: { x: 0, y: 0 },
       spawnChance: 1,
-      color: "red",
       icon: Apocalypse,
-      size: 200,
+      size: 300,
     },
   },
   ABILITIES: {
@@ -239,6 +229,130 @@ export const REGISTRY: {
   },
   UPGRADES: {
     // =========================================================================
+    // OFFENSIVE CATEGORY
+    // =========================================================================
+    HF_TRIGGERS: {
+      id: "HF_TRIGGERS",
+      category: "ROBOTICS",
+      tier: 1,
+      name: "HF Triggers",
+      description: "+10% Fire Rate for all Robots.",
+      cost: { scrap: 500 },
+      maxLevel: 10,
+      icon: Zap,
+      modifiers: { fireRateMult: 0.1 },
+    },
+    CALIBRATED_OPTICS: {
+      id: "CALIBRATED_OPTICS",
+      category: "ROBOTICS",
+      tier: 1,
+      name: "Calibrated Optics",
+      description: "+5% Critical Hit chance.",
+      cost: { scrap: 750 },
+      maxLevel: 5,
+      icon: Target,
+      modifiers: { critChance: 0.05 },
+    },
+    SENTRY_SPEC: {
+      id: "SENTRY_SPEC",
+      category: "ROBOTICS",
+      tier: 2,
+      requires: ["HF_TRIGGERS"],
+      name: "Sentry Spec",
+      description: "Sentry units deal +2 damage per level.",
+      cost: { scrap: 1000 },
+      maxLevel: 5,
+      icon: Crosshair,
+      modifiers: { sentryDamage: 2 },
+    },
+    CRITICAL_HIT: {
+      id: "CRITICAL_HIT",
+      category: "ROBOTICS",
+      tier: 2,
+      requires: ["CALIBRATED_OPTICS"],
+      name: "Critical Hit",
+      description:
+        "Sniper critical hits have a chance to stun a target for 5s.",
+      cost: { scrap: 1500 },
+      maxLevel: 2,
+      icon: Target,
+      modifiers: { incapacitateChance: 0.25 },
+    },
+    ACID_ROUNDS: {
+      id: "ACID_ROUNDS",
+      category: "ROBOTICS",
+      tier: 3,
+      requires: ["SENTRY_SPEC"],
+      name: "Acid Rounds",
+      description:
+        "Acid Rounds have a 10% chance per level to melt target armor for 4 seconds, amplifying all incoming bullet damage by +20%.",
+      cost: { scrap: 1200 },
+      maxLevel: 3,
+      icon: Crosshair,
+      modifiers: { acidChance: 0.1 },
+    },
+    DUAL_BARREL: {
+      id: "DUAL_BARREL",
+      category: "ROBOTICS",
+      tier: 3,
+      requires: ["CRITICAL_HIT"],
+      name: "Dual-Barrel Mod",
+      description: "5% chance to fire two projectiles.",
+      cost: { scrap: 2500 },
+      maxLevel: 5,
+      icon: Zap,
+      modifiers: { doubleShotChance: 0.05 },
+    },
+    RICOCHET: {
+      id: "RICOCHET",
+      category: "ROBOTICS",
+      tier: 4,
+      requires: ["ACID_ROUNDS"],
+      name: "Ricochet",
+      description:
+        "5% chance per level for kills to ricochet to another target.",
+      cost: { scrap: 1400 },
+      maxLevel: 5,
+      icon: Zap,
+      modifiers: { ricochetChance: 0.05 },
+    },
+    TARGETING_LINK: {
+      id: "TARGETING_LINK",
+      category: "ROBOTICS",
+      tier: 4,
+      requires: ["DUAL_BARREL"],
+      name: "Targeting Link",
+      description: "+5% damage per robot on same target.",
+      cost: { scrap: 3000 },
+      maxLevel: 1,
+      icon: Target,
+      modifiers: { stackDamageMult: 0.05 },
+    },
+    EXPLOSIVE_ROUNDS: {
+      id: "EXPLOSIVE_ROUNDS",
+      category: "ROBOTICS",
+      tier: 5,
+      requires: ["RICOCHET"],
+      name: "Explosive Rounds",
+      description: "10% chance for kills to cause AOE.",
+      cost: { scrap: 3500 },
+      maxLevel: 3,
+      icon: Zap,
+      modifiers: { explosionChance: 0.1 },
+    },
+    ALPHA_STRIKE: {
+      id: "ALPHA_STRIKE",
+      category: "ROBOTICS",
+      tier: 5,
+      requires: ["TARGETING_LINK"],
+      name: "Alpha Strike",
+      description: "First shot on new target deals +50%.",
+      cost: { scrap: 4000 },
+      maxLevel: 1,
+      icon: Target,
+      modifiers: { firstShotMult: 0.5 },
+    },
+    // =========================================================================
     // DEFENCE CATEGORY
     // =========================================================================
     REINFORCED_CORE: {
@@ -246,23 +360,23 @@ export const REGISTRY: {
       category: "FORTRESS",
       tier: 1,
       name: "Reinforced Core",
-      description: "Increases Base Max HP by +25.",
+      description: "Increases Max HP by +50.",
       cost: { scrap: 400 },
       maxLevel: 10,
       icon: ShieldPlus,
-      modifiers: { maxHp: 25 },
+      modifiers: { maxHp: 50 },
     },
     EMERGENCY_REPAIR: {
       id: "EMERGENCY_REPAIR",
       category: "FORTRESS",
       tier: 2,
       requires: ["REINFORCED_CORE"],
-      name: "Emergency Shield",
-      description: "Instantly restore +50 HP when below 25% MaxHP.",
+      name: "Emergency Repair",
+      description: "Instantly restore +100 HP when below 25% MaxHP.",
       cost: { scrap: 800 },
       maxLevel: 1,
       icon: Shield,
-      modifiers: { hpFlat: 50 },
+      modifiers: { hpFlat: 100 },
     },
     THORNS_PROTOCOL: {
       id: "THORNS_PROTOCOL",
@@ -360,131 +474,6 @@ export const REGISTRY: {
       icon: ShieldPlus,
       modifiers: { abilityResistMult: 0.1 },
     },
-
-    // =========================================================================
-    // OFFENSIVE CATEGORY
-    // =========================================================================
-    HF_TRIGGERS: {
-      id: "HF_TRIGGERS",
-      category: "ROBOTICS",
-      tier: 1,
-      name: "HF Triggers",
-      description: "+10% Fire Rate for all Robots.",
-      cost: { scrap: 500 },
-      maxLevel: 10,
-      icon: Zap,
-      modifiers: { fireRateMult: 0.1 },
-    },
-    CALIBRATED_OPTICS: {
-      id: "CALIBRATED_OPTICS",
-      category: "ROBOTICS",
-      tier: 1,
-      name: "Calibrated Optics",
-      description: "+5% Critical Hit chance.",
-      cost: { scrap: 750 },
-      maxLevel: 5,
-      icon: Target,
-      modifiers: { critChance: 0.05 },
-    },
-    SENTRY_SPEC: {
-      id: "SENTRY_SPEC",
-      category: "ROBOTICS",
-      tier: 2,
-      requires: ["HF_TRIGGERS"],
-      name: "Sentry Spec",
-      description: "Sentry units deal +5 flat damage.",
-      cost: { scrap: 1000 },
-      maxLevel: 5,
-      icon: Crosshair,
-      modifiers: { sentryDamageFlat: 5 },
-    },
-    CRITICAL_HIT: {
-      id: "CRITICAL_HIT",
-      category: "ROBOTICS",
-      tier: 2,
-      requires: ["CALIBRATED_OPTICS"],
-      name: "Critical Hit",
-      description:
-        "Sniper critical hits have a chance to stun a target for 5s.",
-      cost: { scrap: 1500 },
-      maxLevel: 2,
-      icon: Target,
-      modifiers: { incapacitateChance: 0.25 },
-    },
-    ACID_ROUNDS: {
-      id: "ACID_ROUNDS",
-      category: "ROBOTICS",
-      tier: 3,
-      requires: ["SENTRY_SPEC"],
-      name: "Acid Rounds",
-      description:
-        "Acid Rounds have a 10% chance per level to melt target armor for 4 seconds, amplifying all incoming bullet damage by +20%.",
-      cost: { scrap: 1200 },
-      maxLevel: 3,
-      icon: Crosshair,
-      modifiers: { acidChance: 0.1 },
-    },
-    DUAL_BARREL: {
-      id: "DUAL_BARREL",
-      category: "ROBOTICS",
-      tier: 3,
-      requires: ["CRITICAL_HIT"],
-      name: "Dual-Barrel Mod",
-      description: "5% chance to fire two projectiles.",
-      cost: { scrap: 2500 },
-      maxLevel: 5,
-      icon: Zap,
-      modifiers: { doubleShotChance: 0.05 },
-    },
-    HEAT_MGMT: {
-      id: "HEAT_MGMT",
-      category: "ROBOTICS",
-      tier: 4,
-      requires: ["ACID_ROUNDS"],
-      name: "Heat Management",
-      description: "Reduces reload delays by 15%.",
-      cost: { scrap: 1400 },
-      maxLevel: 4,
-      icon: Zap,
-      modifiers: { reloadMult: -0.15 },
-    },
-    TARGETING_LINK: {
-      id: "TARGETING_LINK",
-      category: "ROBOTICS",
-      tier: 4,
-      requires: ["DUAL_BARREL"],
-      name: "Targeting Link",
-      description: "+5% damage per robot on same target.",
-      cost: { scrap: 3000 },
-      maxLevel: 1,
-      icon: Target,
-      modifiers: { stackDamageMult: 0.05 },
-    },
-    EXPLOSIVE_ROUNDS: {
-      id: "EXPLOSIVE_ROUNDS",
-      category: "ROBOTICS",
-      tier: 5,
-      requires: ["HEAT_MGMT"],
-      name: "Explosive Rounds",
-      description: "10% chance for kills to cause AOE.",
-      cost: { scrap: 3500 },
-      maxLevel: 3,
-      icon: Zap,
-      modifiers: { explosionChance: 0.1 },
-    },
-    ALPHA_STRIKE: {
-      id: "ALPHA_STRIKE",
-      category: "ROBOTICS",
-      tier: 5,
-      requires: ["TARGETING_LINK"],
-      name: "Alpha Strike",
-      description: "First shot on new target deals +50%.",
-      cost: { scrap: 4000 },
-      maxLevel: 1,
-      icon: Target,
-      modifiers: { firstShotMult: 0.5 },
-    },
-
     // =========================================================================
     // LOGISTICS CATEGORY
     // =========================================================================
@@ -610,20 +599,92 @@ export const REGISTRY: {
   },
   BLUEPRINTS: {
     // TURRETS
-    SENTRY_DAMAGE: {
-      id: "SENTRY_DAMAGE",
+    SENTRY_UPGRADE: {
+      id: "SENTRY_UPGRADE",
       tab: "TURRETS",
       title: "Sentry Core Overclock",
-      description:
-        "Upgrades structural kinetic output. Increases flat Sentry damage by +5.",
+      description: "Increases Sentry damage by +5 per level.",
       maxLevel: 5,
       source: "SCRAP",
       cost: { scrap: 800 },
       modifiers: { sentryDamage: 5 },
     },
+    SNIPER_UPGRADE: {
+      id: "SNIPER_UPGRADE",
+      tab: "TURRETS",
+      title: "Sniper Core Overclock",
+      description: "Increases Sniper damage by +5 per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 1200 },
+      modifiers: { sniperDamage: 5 },
+    },
+    SHOTGUN_UPGRADE: {
+      id: "SHOTGUN_UPGRADE",
+      tab: "TURRETS",
+      title: "Shotgun Core Overclock",
+      description: "Increases Shotgun damage by +5 per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 1500 },
+      modifiers: { shotgunDamage: 5 },
+    },
+    ROCKET_UPGRADE: {
+      id: "ROCKET_UPGRADE",
+      tab: "TURRETS",
+      title: "Rocket Core Overclock",
+      description: "Increases Rocket damage by +5 per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 2000 },
+      modifiers: { rocketDamage: 5 },
+    },
+    // ABILITIES
+    EMP_UPGRADE: {
+      id: "EMP_UPGRADE",
+      tab: "ABILITIES",
+      title: "EMP Upgrade",
+      description: "Increases EMP stun duration by +2s per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 1000 },
+      modifiers: { empDuration: 2 },
+    },
+    REPAIR_UPGRADE: {
+      id: "REPAIR_UPGRADE",
+      tab: "ABILITIES",
+      title: "Repair Upgrade",
+      description: "Increases Repair healing by +25 per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 1000 },
+      modifiers: { repairHeal: 25 },
+    },
+    OVERCLOCK_UPGRADE: {
+      id: "OVERCLOCK_UPGRADE",
+      tab: "ABILITIES",
+      title: "Overclock Upgrade",
+      description: "Increases Overclock duration by +2s per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 1000 },
+      modifiers: { overclockDuration: 2 },
+    },
+    NAPALM_UPGRADE: {
+      id: "NAPALM_UPGRADE",
+      tab: "ABILITIES",
+      title: "Napalm Upgrade",
+      description: "Increases Napalm damage by +5 per level.",
+      maxLevel: 5,
+      source: "SCRAP",
+      cost: { scrap: 1500 },
+      modifiers: { napalmDamage: 5 },
+    },
+    // EXPANSIONS
+    // TURRETS EXPANSIONS
     SNIPER_BLUEPRINT: {
       id: "SNIPER_BLUEPRINT",
-      tab: "TURRETS",
+      tab: "EXPANSIONS",
       title: "Sniper Blueprint",
       description:
         "Unlocks assembly authorization for long-range piercing railgun units.",
@@ -632,7 +693,7 @@ export const REGISTRY: {
     },
     SHOTGUN_BLUEPRINT: {
       id: "SHOTGUN_BLUEPRINT",
-      tab: "TURRETS",
+      tab: "EXPANSIONS",
       title: "Shotgun Blueprint",
       description:
         "Unlocks assembly authorization for low-range but high-damage shotgun units.",
@@ -641,44 +702,44 @@ export const REGISTRY: {
     },
     ROCKET_BLUEPRINT: {
       id: "ROCKET_BLUEPRINT",
-      tab: "TURRETS",
+      tab: "EXPANSIONS",
       title: "Rocket Blueprint",
       description:
         "Unlocks assembly authorization for long-range rocket launcher units.",
       source: "MATERIAL_DROP",
       cost: { scrap: 7000, alloy: 30 },
     },
-    // ABILITIES
-    ABILITY_EMP: {
-      id: "ABILITY_EMP",
-      tab: "ABILITIES",
+    // ABILITIES EXPANSIONS
+    EMP_BLUEPRINT: {
+      id: "EMP_BLUEPRINT",
+      tab: "EXPANSIONS",
       title: "EMP BURST",
       description:
         "Authorizes the active system bar capability to stun moving enemies.",
       source: "SCRAP",
       cost: { scrap: 1200 },
     },
-    ABILITY_REPAIR: {
-      id: "ABILITY_REPAIR",
-      tab: "ABILITIES",
+    REPAIR_BLUEPRINT: {
+      id: "REPAIR_BLUEPRINT",
+      tab: "EXPANSIONS",
       title: "REPAIR",
       description:
         "Authorizes the active system bar capability to repair damaged units.",
       source: "SCRAP",
       cost: { scrap: 3000 },
     },
-    ABILITY_OVERCLOCK: {
-      id: "ABILITY_OVERCLOCK",
-      tab: "ABILITIES",
+    OVERCLOCK_BLUEPRINT: {
+      id: "OVERCLOCK_BLUEPRINT",
+      tab: "EXPANSIONS",
       title: "OVERCLOCK",
       description:
         "Authorizes the active system bar capability to overclock units.",
       source: "SCRAP",
       cost: { scrap: 5000 },
     },
-    ABILITY_NAPALM: {
-      id: "ABILITY_NAPALM",
-      tab: "ABILITIES",
+    NAPALM_BLUEPRINT: {
+      id: "NAPALM_BLUEPRINT",
+      tab: "EXPANSIONS",
       title: "NAPALM",
       description:
         "Authorizes the active system bar capability to ignite moving enemies.",

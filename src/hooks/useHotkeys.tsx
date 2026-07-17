@@ -6,8 +6,29 @@ export const useHotkeys = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const state = useGameStore.getState();
 
+      // Return if game is not playing
       if (state.status !== "PLAYING") return;
 
+      if (e.altKey) {
+        e.preventDefault(); // Prevent browser behavior for alt key
+        switch (e.key) {
+          case "1":
+            state.triggerAbility("EMP");
+            break;
+          case "2":
+            state.triggerAbility("REPAIR");
+            break;
+          case "3":
+            state.triggerAbility("OVERCLOCK");
+            break;
+          case "4":
+            state.triggerAbility("NAPALM");
+            break;
+        }
+        return;
+      }
+
+      // Weapon selection: [1-4]
       switch (e.key) {
         case "1":
           state.updateTurretType("SENTRY");
@@ -21,21 +42,10 @@ export const useHotkeys = () => {
         case "4":
           state.updateTurretType("ROCKET");
           break;
-        case "5":
-          state.triggerAbility("EMP");
-          break;
-        case "6":
-          state.triggerAbility("REPAIR");
-          break;
-        case "7":
-          state.triggerAbility("OVERCLOCK");
-          break;
-        case "8":
-          state.triggerAbility("NAPALM");
-          break;
         default:
           break;
       }
+      // =========================================================================
     };
 
     window.addEventListener("keydown", handleKeyDown);

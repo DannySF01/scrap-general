@@ -98,7 +98,7 @@ export function Arena() {
   return (
     <div
       ref={arenaRef}
-      className="relative w-full h-full bg-slate-950 overflow-hidden"
+      className="relative w-full h-full"
       style={status === "PLAYING" ? { cursor: "none" } : { cursor: "default" }}
     >
       <Battlefield />

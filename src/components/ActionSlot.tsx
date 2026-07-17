@@ -78,7 +78,7 @@ export default function ActionSlot({ abilityId, hotkey }: ActionSlotProps) {
         ${isActive ? "bg-orange-500/20 text-orange-400 border border-orange-500/30" : "bg-stone-900 text-stone-500 group-hover:text-stone-400"}
       `}
       >
-        {hotkey}
+        {"Alt-" + hotkey}
       </span>
 
       {/* ABILITY ICON */}

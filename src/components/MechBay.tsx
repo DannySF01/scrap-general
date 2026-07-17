@@ -40,7 +40,7 @@ export default function MechBay() {
               MECHANIC BAY
             </h1>
             <p className="text-[8px] text-stone-500 font-bold tracking-widest uppercase">
-              Structural upgrades, turret modifications, and utility expansions
+              Turret upgrades and utility expansions
             </p>
           </div>
         </div>
@@ -50,21 +50,21 @@ export default function MechBay() {
             label="SCRAP"
             val={scrap}
             unit="SC"
-            color="text-stone-300"
+            color="text-orange-400"
           />
           <div className="w-px bg-stone-900 self-stretch opacity-60" />
           <MaterialDisplay
             label="ALLOY"
             val={alloy}
             unit="AL"
-            color="text-stone-400"
+            color="text-purple-400"
           />
           <div className="w-px bg-slate-900 self-stretch opacity-60" />
           <MaterialDisplay
             label="CORE"
             val={core}
             unit="C"
-            color="text-orange-500/80"
+            color="text-rose-500"
           />
         </div>
       </header>
@@ -77,16 +77,16 @@ export default function MechBay() {
           icon={<Cpu size={11} />}
         />
         <TerminalTab
-          label="Expansions"
-          active={activeTab === "EXPANSIONS"}
-          onClick={() => setActiveTab("EXPANSIONS")}
-          icon={<LayoutGrid size={11} />}
-        />
-        <TerminalTab
           label="Ability Upgrades"
           active={activeTab === "ABILITIES"}
           onClick={() => setActiveTab("ABILITIES")}
           icon={<Layers size={11} />}
+        />
+        <TerminalTab
+          label="Expansions"
+          active={activeTab === "EXPANSIONS"}
+          onClick={() => setActiveTab("EXPANSIONS")}
+          icon={<LayoutGrid size={11} />}
         />
       </div>
 
@@ -99,6 +99,13 @@ export default function MechBay() {
               const isMaxed = isProgressive && currentLvl >= (bp.maxLevel ?? 0);
               const isUnlocked = !isProgressive && !!unlocks[bp.id];
 
+              // Prevent upgrading locked weapons/abilities
+              const associateBlueprint = bp.id.split("_")[0];
+              const isWeaponUnlocked =
+                associateBlueprint === "SENTRY" ||
+                !!unlocks[`${associateBlueprint}_BLUEPRINT`];
+              if (!isWeaponUnlocked && bp.tab !== "EXPANSIONS") return null;
+
               const cost_scrap = dynamicCost(bp.cost.scrap || 0, currentLvl);
               const cost_alloy = dynamicCost(bp.cost.alloy || 0, currentLvl);
               const cost_core = dynamicCost(bp.cost.core || 0, currentLvl);
@@ -110,7 +117,7 @@ export default function MechBay() {
 
               let cardStyle =
                 "bg-stone-900/20 border-stone-900/60 hover:border-stone-800 text-stone-300";
-              if (isUnlocked || isMaxed) {
+              if (isMaxed) {
                 cardStyle =
                   "bg-orange-500/5 border-orange-950/40 text-stone-400";
               }
@@ -131,7 +138,7 @@ export default function MechBay() {
                       <div className="text-left">
                         <SourceBadge source={bp.source} />
                         <h3
-                          className={`text-[11px] font-bold uppercase tracking-widest mt-2 ${isUnlocked || currentLvl > 0 ? "text-orange-500/80" : "text-stone-100"}`}
+                          className={`text-[11px] font-bold uppercase tracking-widest mt-2`}
                         >
                           {bp.title}
                         </h3>
@@ -164,7 +171,7 @@ export default function MechBay() {
                             <span
                               className={
                                 scrap >= cost_scrap
-                                  ? "text-stone-300"
+                                  ? "text-orange-400"
                                   : "text-rose-500/80"
                               }
                             >
@@ -175,7 +182,7 @@ export default function MechBay() {
                             <span
                               className={
                                 alloy >= cost_alloy
-                                  ? "text-stone-400"
+                                  ? "text-purple-400"
                                   : "text-rose-500/80"
                               }
                             >

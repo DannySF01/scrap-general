@@ -14,13 +14,16 @@ export default function CommandCenter() {
     null,
   );
 
+  const isEmergencyRepairUnlocked = upgrades["EMERGENCY_REPAIR"];
+  const isNanoRepairUnlocked = upgrades["NANO_REPAIR"];
+
   const dmgMult = resolveStat("damage", 1, upgrades);
   const fireRateMult = 1 / resolveStat("fireRate", 1, upgrades);
   const critMult = resolveStat("critChance", 0, upgrades) * 100;
   const hpRegen = resolveStat("regenFlat", 0, upgrades);
 
   const unlockedAbilities = Object.entries(REGISTRY.ABILITIES).filter(
-    ([key]) => unlocks[`ABILITY_${key}`],
+    ([key]) => unlocks[`${key}_BLUEPRINT`],
   );
 
   return (
@@ -55,24 +58,28 @@ export default function CommandCenter() {
                         {Math.ceil(hp)} / {maxHp} HP
                       </span>
                     </div>
-                    <div className="flex justify-between font-mono border-t border-stone-900/50 pt-1 mt-0.5">
-                      <span>NANO REPAIR RATE:</span>
-                      {hpRegen > 0 ? (
-                        <span className="text-emerald-400 font-bold">
-                          +{hpRegen} HP / 5s
-                        </span>
-                      ) : (
-                        <span className="text-stone-600">0.0 HP / 5s</span>
-                      )}
-                    </div>
-                    <div className="flex justify-between font-mono border-t border-stone-900/50 pt-1 mt-0.5">
-                      <span>EMERGENCY REPAIR:</span>
-                      {isEmergencyRepairSpent ? (
-                        <span className="text-red-500">UNAVAILABLE</span>
-                      ) : (
-                        <span className="text-emerald-400">AVAILABLE</span>
-                      )}
-                    </div>
+                    {isNanoRepairUnlocked && (
+                      <div className="flex justify-between font-mono border-t border-stone-900/50 pt-1 mt-0.5">
+                        <span>NANO REPAIR RATE:</span>
+                        {hpRegen > 0 ? (
+                          <span className="text-emerald-400 font-bold">
+                            +{hpRegen} HP / 5s
+                          </span>
+                        ) : (
+                          <span className="text-stone-600">0.0 HP / 5s</span>
+                        )}
+                      </div>
+                    )}
+                    {isEmergencyRepairUnlocked && (
+                      <div className="flex justify-between font-mono border-t border-stone-900/50 pt-1 mt-0.5">
+                        <span>EMERGENCY REPAIR:</span>
+                        {isEmergencyRepairSpent ? (
+                          <span className="text-red-500">UNAVAILABLE</span>
+                        ) : (
+                          <span className="text-emerald-400">AVAILABLE</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -153,7 +160,7 @@ export default function CommandCenter() {
                 abilityId={
                   targetAbility ? (targetAbility as any).type : undefined
                 }
-                hotkey={i + 5} // Ability hotkeys start at 5 to 8
+                hotkey={i + 1} // Ability hotkeys start at 5 to 8
               />
             );
           })}

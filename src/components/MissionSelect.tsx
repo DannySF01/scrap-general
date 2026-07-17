@@ -7,7 +7,7 @@ export function MissionSelect() {
   const { setView, selectLevel, startGame, completedLevels } = useGameStore();
 
   return (
-    <div className="h-full w-full bg-[#0c0a09] font-mono p-12 flex flex-col relative select-none overflow-y-auto custom-scrollbar">
+    <div className="h-full w-full bg-[#0c0a09] font-mono p-12 flex flex-col relative select-none custom-scrollbar">
       <div className="flex items-center gap-6 border-b border-stone-900/60 pb-6 mb-10">
         <button
           onClick={() => setView("MAIN")}
@@ -17,15 +17,15 @@ export function MissionSelect() {
         </button>
         <div className="text-left">
           <h1 className="text-2xl font-light tracking-[0.18em] text-stone-100 uppercase leading-none mb-1">
-            CAMPAIGN MAP
+            CAMPAIGN
           </h1>
           <p className="text-[8px] text-stone-500 font-bold uppercase tracking-widest">
-            Select an active zone to deploy your defense chassis
+            MISSIONS & CHALLENGES
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-10 pb-12">
+      <div className="flex flex-col gap-10 pb-12 pr-6 overflow-y-auto">
         {Object.values(CAMPAIGN_MANIFEST).map((chapter) => (
           <div
             key={chapter.id}

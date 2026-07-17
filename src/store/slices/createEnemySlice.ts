@@ -126,6 +126,14 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
     }
 
     set((state) => {
+      const activeRegenerators = state.enemies.filter(
+        (e) => e.type === "REGENERATOR" && e.hp > 0,
+      );
+      // Raio de alcance da cura em área (50% da grelha de distância)
+      const healRadius = 50;
+      // Quantidade de cura convertida para frames (3 HP por segundo / 60)
+      const flatHealPerFrame = (3 / 60) * timeStepMultiplier;
+
       const updatedEnemies = state.enemies.map((e) => {
         let nextHp = e.hp;
         let currentY = e.position.y;
@@ -150,15 +158,22 @@ export const createEnemySlice: StateCreator<GameState, [], [], EnemySlice> = (
         // Napalm damage enemies each tick
         if (isNapalmActive) nextHp -= 1 * timeStepMultiplier;
 
+        // Regenerators heal alies near them
+        if (nextHp < e.maxHp) {
+          const isNearHealer = activeRegenerators.some((healer) => {
+            const rdx = e.position.x - healer.position.x;
+            const rdy = e.position.y - healer.position.y;
+            const distance = Math.sqrt(rdx * rdx + rdy * rdy);
+
+            return distance <= healRadius;
+          });
+          if (isNearHealer) {
+            nextHp = Math.min(e.maxHp, nextHp + flatHealPerFrame);
+          }
+        }
+
         // Check if enemy is stunned for 5 seconds
         const isStunned = e.stunnedAt && now < e.stunnedAt;
-
-        // REGENERATOR regenerates 10% of max hp per second
-        if (e.type === "REGENERATOR" && nextHp > 0 && nextHp < e.maxHp) {
-          if (isStunned) return e;
-          const flatRegenPerFrame = ((e.maxHp * 0.1) / 60) * timeStepMultiplier;
-          nextHp = Math.min(e.maxHp, nextHp + flatRegenPerFrame);
-        }
 
         // Moves enemies until they hit the base
         if (!isStunned && currentY < 64) {

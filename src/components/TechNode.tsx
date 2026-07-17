@@ -99,19 +99,23 @@ export default function TechNode({ node, level = 0 }: TechNodeProps) {
                 </p>
                 <div className="flex justify-between items-center font-mono">
                   <span className="text-[10px] text-stone-400 font-bold">
-                    {stat.label === "FIRERATE"
+                    {stat.label.includes("RATE")
                       ? `${(1000 / stat.current).toFixed(1)}/s`
-                      : stat.current.toFixed(2)}
+                      : stat.label.includes("CHANCE")
+                        ? `${(stat.current * 100).toFixed(0)}%`
+                        : stat.current.toFixed(0)}
                   </span>
                   {!isMaxed && (
                     <>
                       <div className="text-stone-600 text-[8px] tracking-tighter">
                         &gt;&gt;
                       </div>
-                      <span className="text-[10px] text-orange-400 font-bold">
-                        {stat.label === "FIRERATE"
+                      <span className="text-[10px] text-stone-300 font-bold">
+                        {stat.label.includes("RATE")
                           ? `${(1000 / stat.projected).toFixed(1)}/s`
-                          : stat.projected.toFixed(1)}
+                          : stat.label.includes("CHANCE")
+                            ? `${(stat.projected * 100).toFixed(0)}%`
+                            : stat.projected.toFixed(0)}
                       </span>
                     </>
                   )}
@@ -130,11 +134,11 @@ export default function TechNode({ node, level = 0 }: TechNodeProps) {
                     Cost
                   </p>
                   {nextCost > scrap ? (
-                    <p className="text-[10px] text-rose-500 font-bold font-mono">
+                    <p className="text-[10px] text-rose-500/80 font-bold font-mono">
                       {nextCost} SC
                     </p>
                   ) : (
-                    <p className="text-[10px] text-stone-300 font-bold font-mono">
+                    <p className="text-[10px] text-orange-400 font-bold font-mono">
                       {nextCost} SC
                     </p>
                   )}

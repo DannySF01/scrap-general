@@ -3,7 +3,6 @@ import { useGameStore } from "../store/useGameStore";
 import { useEffect, useState } from "react";
 import { LEVELS_MANIFEST } from "../data/levels";
 import { REGISTRY } from "../data/registry";
-import { Skull } from "lucide-react";
 
 export function WaveAlert() {
   const { wave, status, currentLevelId } = useGameStore();
@@ -44,7 +43,7 @@ export function WaveAlert() {
               {allowedEnemyTypes.map((type) => {
                 const enemyConfig = REGISTRY.ENEMIES[type];
                 if (!enemyConfig) return null;
-                const EnemyIcon = enemyConfig.icon || Skull;
+                const EnemyIcon = enemyConfig.icon;
 
                 return (
                   <motion.div
@@ -53,7 +52,11 @@ export function WaveAlert() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex items-center gap-1.5"
                   >
-                    <EnemyIcon size={14} style={{ color: enemyConfig.color }} />
+                    <img
+                      src={EnemyIcon}
+                      alt={enemyConfig.type}
+                      className="w-4 h-4"
+                    />
                     <span className="text-[8px] tracking-widest text-stone-200 font-bold uppercase">
                       {enemyConfig.type}
                     </span>

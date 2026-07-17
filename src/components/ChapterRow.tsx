@@ -58,7 +58,7 @@ export function ChapterRow({
                     className={`text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded-2xs border uppercase
                     ${isBossStage ? "border-orange-900/40 text-orange-500 bg-orange-500/5" : "border-stone-900 text-stone-500"}`}
                   >
-                    SEC {lvl.id}
+                    SECTOR {lvl.id}
                   </span>
                   {isBeaten ? (
                     <CheckCircle2 size={12} className="text-stone-400" />
@@ -82,15 +82,20 @@ export function ChapterRow({
 
               <div className="border-t border-stone-900/50 pt-2 flex justify-between items-center mt-auto">
                 <div className="flex flex-col gap-0.5 text-[8px] font-bold tracking-wider select-none">
-                  <span className="text-stone-600">CARGO</span>
+                  <span className="text-stone-600">REWARD</span>
                   <div className="flex gap-2.5 font-mono">
                     {lvl.rewards.scrap && (
-                      <span className="text-stone-300">
+                      <span className="text-orange-400">
                         +{lvl.rewards.scrap} SCRAP
                       </span>
                     )}
+                    {lvl.rewards.alloy && (
+                      <span className="text-purple-400">
+                        +{lvl.rewards.alloy} ALLOY
+                      </span>
+                    )}
                     {lvl.rewards.core && (
-                      <span className="text-orange-500/80">
+                      <span className="text-rose-500">
                         +{lvl.rewards.core} CORE
                       </span>
                     )}

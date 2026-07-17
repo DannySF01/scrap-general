@@ -31,6 +31,24 @@ export function VfxLayer({
     );
   }
 
+  if (vfx.type === "RICOCHET") {
+    return (
+      <motion.div
+        key={vfx.id}
+        initial={{ opacity: 1, scale: 0.5 }}
+        animate={{ opacity: 0, scale: 1.6 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        className="absolute w-4 h-4 rounded-full border border-orange-400 bg-orange-500/10 shadow-[0_0_8px_#f97316] pointer-events-none"
+        style={{
+          left: `${vfx.pos.x}%`,
+          top: `${vfx.pos.y}%`,
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+    );
+  }
+
   const randomOffsetX = (Math.random() - 0.5) * 4;
   const isCrit = vfx.type === "CRIT";
 

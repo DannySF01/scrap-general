@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import type { Bullet, Turret } from "../../types/game";
+import type { Bullet, Enemy, Turret } from "../../types/game";
 import type { GameState } from "../useGameStore";
 import { REGISTRY } from "../../data/registry";
 import { resolveStat } from "../../utils/stats";
@@ -13,13 +13,11 @@ export interface CombatSlice {
   selectedTurretType: Turret["type"];
   selectTurret: (type: Turret["type"]) => void;
   processCombat: (dt: number) => void;
-  vfxEvents: {
-    id: number;
-    type: string;
-    pos: { x: number; y: number };
-    radius?: number;
-  }[];
-  removeVfx: (id: number) => void;
+  dispatchVfx: (
+    pos: Enemy["position"],
+    type: "EXPLOSION" | "CRIT" | "BLOCKED" | "RICOCHET",
+    turretTemplate?: any,
+  ) => void;
   updatePlayerPos: (x: number, y: number) => void;
   updateTurretType: (type: Turret["type"]) => void;
   setFiring: (isFiring: boolean) => void;
@@ -35,9 +33,23 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
   bullets: [],
   lastShotTime: 0,
   selectedTurretType: "SENTRY",
-  vfxEvents: [],
-  removeVfx: (id: number) =>
-    set({ vfxEvents: get().vfxEvents.filter((e) => e.id !== id) }),
+
+  dispatchVfx: (
+    pos: Enemy["position"],
+    type: "EXPLOSION" | "CRIT" | "BLOCKED" | "RICOCHET",
+    turretTemplate?: Turret,
+  ) => {
+    window.dispatchEvent(
+      new CustomEvent("spawnVfx", {
+        detail: {
+          id: Math.random(),
+          type: type,
+          pos: { x: pos.x, y: pos.y },
+          radius: turretTemplate?.splashRadius || 0,
+        },
+      }),
+    );
+  },
 
   selectTurret: (type: Turret["type"]) => set({ selectedTurretType: type }),
 
@@ -67,13 +79,13 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       upgrades,
       bullets,
       abilityActive,
+      dispatchVfx,
     } = get();
     const now = Date.now();
 
     let currentEnemies = [...enemies];
     let activeBullets = [...bullets];
     let totalScrapGained = 0;
-    let newVfx: CombatSlice["vfxEvents"] = [];
 
     // Get selected turret template
     const turretTemplate = REGISTRY.TURRETS[selectedTurretType];
@@ -93,19 +105,21 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           turretTemplate.damage,
           upgrades,
         );
+        // Apply sentry bonus tech
         const sentryBonus =
           selectedTurretType === "SENTRY"
             ? resolveStat("sentryDamage", 0, upgrades)
             : 0;
-        const critChance = resolveStat("critChance", 0, upgrades);
 
+        // Calculate crit
+        const critChance = resolveStat("critChance", 0, upgrades);
         const isCrit = Math.random() < critChance;
 
         const finalDamage = isCrit
           ? (baseDamage + sentryBonus) * 2
           : baseDamage + sentryBonus;
 
-        const bulletSpeed = (turretTemplate as any).bulletSpeed ?? 6.0;
+        const bulletSpeed = 6;
 
         // Double shot Tech
         const doubleShotChance = resolveStat("doubleShotChance", 0, upgrades);
@@ -181,7 +195,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       }
 
       //  Destroy bullet if it reaches max range
-      if ((bullet as any).isShotgunPellet) {
+      if ((bullet as Bullet).isShotgunPellet) {
         const distanceTravelledY = Math.abs((bullet as any).startY - nextY);
         if (distanceTravelledY >= (bullet as any).maxDistanceY) {
           continue;
@@ -206,11 +220,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       if (hitEnemy) {
         // Shielder Blocks Single/Splash calculations
         if (hitEnemy.type === "SHIELDER" && Math.random() < 0.2) {
-          newVfx.push({
-            id: Math.random(),
-            type: "BLOCKED",
-            pos: hitEnemy.position,
-          });
+          dispatchVfx(hitEnemy.position, "BLOCKED");
           continue;
         }
 
@@ -219,13 +229,7 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
 
         // Apply damage to the hit enemy
         if (turretTemplate.splashRadius) {
-          newVfx.push({
-            id: Math.random(),
-            type: "EXPLOSION",
-            pos: hitEnemy.position,
-            radius: turretTemplate.splashRadius,
-          });
-
+          dispatchVfx(hitEnemy.position, "EXPLOSION", turretTemplate);
           currentEnemies = currentEnemies.map((e) => {
             const sdx = e.position.x - hitEnemy!.position.x;
             const sdy = e.position.y - hitEnemy!.position.y;
@@ -262,13 +266,64 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
           });
         }
 
-        if (bullet.isCrit)
-          newVfx.push({
-            id: Math.random(),
-            type: "CRIT",
-            pos: hitEnemy.position,
-          });
+        if (bullet.isCrit) dispatchVfx(hitEnemy.position, "CRIT");
 
+        const ricochetChance = resolveStat("ricochetChance", 0, upgrades);
+
+        // Prevent infinite bouncing chains on the same frame
+        const canBounce =
+          ricochetChance > 0 &&
+          Math.random() < ricochetChance &&
+          !hitEnemy.hasBulletBounced;
+
+        if (canBounce) {
+          let closestSecondaryEnemy: typeof hitEnemy | null = null;
+          let shortestDistance = 99999;
+
+          for (const potentialTarget of currentEnemies) {
+            // Ignore the target we just shot, and skip anything already dead
+            if (potentialTarget.id === hitEnemy.id || potentialTarget.hp <= 0)
+              continue;
+
+            const tx = potentialTarget.position.x - hitEnemy.position.x;
+            const ty = potentialTarget.position.y - hitEnemy.position.y;
+            const targetDistance = Math.sqrt(tx * tx + ty * ty);
+
+            // Find the closest secondary target (up to 25 pixels away)
+            if (targetDistance < shortestDistance && targetDistance < 25) {
+              shortestDistance = targetDistance;
+              closestSecondaryEnemy = potentialTarget;
+            }
+          }
+
+          // Bounce the bullet off the closest secondary target
+          if (closestSecondaryEnemy) {
+            const bounceDx = closestSecondaryEnemy.position.x - nextX;
+            const bounceDy = closestSecondaryEnemy.position.y - nextY;
+
+            // Calculate the distance toward the secondary target
+            const bounceDistance = Math.sqrt(
+              bounceDx * bounceDx + bounceDy * bounceDy,
+            );
+
+            if (bounceDistance > 0) {
+              const newDirX = bounceDx / bounceDistance;
+              const newDirY = bounceDy / bounceDistance;
+
+              dispatchVfx(hitEnemy.position, "RICOCHET");
+
+              updatedBullets.push({
+                ...bullet,
+                x: nextX,
+                y: nextY,
+                dirX: newDirX,
+                dirY: newDirY,
+                hasBulletBounced: true,
+              } as any);
+              continue; // Keeps the bullet alive until it hits the secondary target
+            }
+          }
+        }
         continue; // Destroy bullet if it hits an enemy
       }
 
@@ -303,7 +358,6 @@ export const createCombatSlice: StateCreator<GameState, [], [], CombatSlice> = (
       enemies: survivingEnemies,
       bullets: updatedBullets,
       scrap: state.scrap + totalScrapGained,
-      vfxEvents: [...state.vfxEvents, ...newVfx],
     }));
   },
 });

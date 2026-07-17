@@ -10,7 +10,6 @@ export function EnemyUnit({ enemy }: { enemy: Enemy }) {
   const isDying = useRef<boolean>(false);
 
   const config = REGISTRY.ENEMIES[enemy.type];
-  const Icon = config.icon;
 
   const now = Date.now();
   const isStunned = enemy.stunnedAt && now < enemy.stunnedAt + 5000; // 5 seconds stun duration
@@ -94,7 +93,7 @@ export function EnemyUnit({ enemy }: { enemy: Enemy }) {
   return (
     <div
       ref={containerRef}
-      className="absolute w-16 h-16 will-change-transform flex flex-col items-center justify-center select-none pointer-events-none z-10"
+      className="absolute will-change-transform flex flex-col items-center justify-center select-none pointer-events-none z-10"
       style={{
         left: "0px",
         top: "0px",
@@ -114,10 +113,18 @@ export function EnemyUnit({ enemy }: { enemy: Enemy }) {
 
       <div
         ref={iconWrapperRef}
-        style={{ color: config.color }}
-        className="transition-opacity duration-100 flex items-center justify-center w-full h-auto shrink-0"
+        className="transition-all duration-200 flex items-center justify-center w-full h-auto shrink-0 relative"
       >
-        <Icon size={config.size} className="opacity-90 " />
+        <img
+          src={enemy.icon}
+          alt={enemy.type}
+          style={{ width: `${config.size}px`, height: "auto" }}
+          className="drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] object-contain"
+        />
+
+        {isStunned && (
+          <div className="absolute top-[75%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] border border-white z-20" />
+        )}
       </div>
     </div>
   );

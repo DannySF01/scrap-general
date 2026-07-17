@@ -28,7 +28,7 @@ export default function App() {
   }, [status, togglePause]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative font-mono">
+    <div className="h-screen w-screen max-w-5xl mx-auto shadow-xl overflow-hidden relative font-mono">
       <main className="absolute inset-0 ">
         <Arena />
         <VfxManager />

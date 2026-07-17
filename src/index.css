@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --background: var(--color-slate-950);
-  --foreground: var(--color-slate-100);
+  --background: var(--color-stone-950);
+  --foreground: var(--color-stone-100);
 }
 
 @layer base {
@@ -71,25 +71,26 @@
 
 @utility custom-scrollbar {
   &::-webkit-scrollbar {
-    height: 4px;
+    width: 3px;
+    height: 3px;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
-    border-radius: 9999px;
+    background: rgba(12, 10, 9, 0.4);
+    border-radius: 0px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.2);
-    border-radius: 9999px;
-    border: 1px solid rgba(99, 102, 241, 0.1);
-    transition: background 0.2s ease;
+    background: rgba(120, 113, 108, 0.2);
+    border-radius: 0px;
+    border: 1px solid rgba(120, 113, 108, 0.05);
+    transition: background 0.15s ease-in-out;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.5);
+    background: rgba(249, 115, 22, 0.3);
   }
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.2) rgba(15, 23, 42, 0.3);
+  scrollbar-color: rgba(120, 113, 108, 0.2) rgba(12, 10, 9, 0.4);
 }

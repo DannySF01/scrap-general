@@ -1,22 +1,22 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../store/useGameStore";
 import { ResourceCounter } from "./ResourceCounter";
-import { Pause, Play } from "lucide-react";
+import { Pause } from "lucide-react";
 
 export default function UpperTerminal() {
-  const { currentLevelId, wave, scrap, togglePause, status } = useGameStore();
+  const { currentLevelId, wave, scrap, togglePause } = useGameStore();
 
   return (
     <div className="absolute top-0 inset-x-0 p-4 flex justify-between items-start z-40 pointer-events-none font-mono select-none">
       <div className="pointer-events-auto flex items-center gap-3 bg-stone-950/20 border border-stone-900/40 px-4 py-2 rounded-md backdrop-blur-xs shadow-md">
         <div className="flex flex-col text-left">
-          <span className="text-[7px] font-bold text-orange-500/60 uppercase tracking-widest leading-none mb-1">
+          <span className="text-[7px] font-bold text-stone-300 uppercase tracking-widest leading-none mb-1">
             SCRAP
           </span>
           <ResourceCounter
             label="Scrap"
             value={scrap}
-            color="text-stone-100 font-bold"
+            color="text-orange-400 font-bold"
           />
         </div>
       </div>
@@ -42,18 +42,9 @@ export default function UpperTerminal() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={togglePause}
-          className={`p-2 border rounded-md flex items-center justify-center transition-all duration-200 cursor-pointer relative h-8 w-8
-            ${
-              status === "PAUSED"
-                ? "bg-amber-500/10 border-amber-500/60 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)] animate-pulse"
-                : "bg-stone-950/40 border-stone-800/60 text-stone-400 hover:text-white hover:border-stone-600"
-            }`}
+          className="p-2 border rounded-md flex items-center justify-center transition-all duration-200 cursor-pointer relative h-8 w-8 bg-stone-950/40 border-stone-800/60 text-stone-400 hover:text-white hover:border-stone-600"
         >
-          {status === "PAUSED" ? (
-            <Play size={11} fill="currentColor" />
-          ) : (
-            <Pause size={11} fill="currentColor" />
-          )}
+          <Pause size={11} fill="currentColor" />
         </motion.button>
       </div>
     </div>

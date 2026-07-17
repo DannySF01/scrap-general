@@ -75,6 +75,7 @@ export interface Bullet {
   damage: number;
   speed: number;
   isCrit: boolean;
+  isShotgunPellet?: boolean;
 }
 
 export interface Enemy {
@@ -87,13 +88,13 @@ export interface Enemy {
   position: { x: number; y: number };
   reward: number;
   spawnChance: number;
-  color: string;
-  icon: LucideIcon | React.ComponentType<any>;
+  icon: string;
   size: number;
   lastSpawn?: number;
   destroyedAt?: number;
   stunnedAt?: number;
   meltedAt?: number;
+  hasBulletBounced?: boolean;
 }
 
 export interface ScrapDrop {
